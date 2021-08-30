@@ -57,4 +57,5 @@ plt.ylabel('y')
 x = torch.tensor([[torch.min(x_train)], [torch.max(x_train)]])  # x = [[1], [6]]]
 plt.plot(x, model.f(x).detach(), label='$\\hat y = f(x) = xW+b$')
 plt.legend()
+plt.text(42.75, 17, 'Loss = ' + str(model.loss(x_train, y_train).data))
 plt.show()
