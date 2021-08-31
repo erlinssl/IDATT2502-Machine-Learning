@@ -1,31 +1,27 @@
 import torch
 import matplotlib.pyplot as plt
 import csv
+import pandas as pd
 
 
-fields = []
-rows = []
+# x_es = []
+# y_es = []
+# with open('length_weight.csv', 'r') as csvfile:
+#     csvreader = csv.reader(csvfile)
+#     next(csvreader)
+#     for row in csvreader:
+#         for col in row:
+#             x_es.append(float(row[0]))
+#             y_es.append(float(row[1]))
+#
+# x_train = torch.tensor(x_es).reshape(-1, 1)
+# y_train = torch.tensor(y_es).reshape(-1, 1)
 
-x_es = []
-y_es = []
+x_values = pd.read_csv('length_weight.csv', usecols=['# length']).to_numpy()
+y_values = pd.read_csv('length_weight.csv', usecols=['weight']).to_numpy()
+x_train = torch.Tensor(x_values).reshape(-1, 1)
+y_train = torch.Tensor(y_values).reshape(-1, 1)
 
-with open('length_weight.csv', 'r') as csvfile:
-    csvreader = csv.reader(csvfile)
-
-    fields = next(csvreader)
-
-    for row in csvreader:
-        for col in row:
-            x_es.append(float(row[0]))
-            y_es.append(float(row[1]))
-
-# x_values = pd.read_csv('length_weight.csv', usecols=['# length'])
-# y_values = pd.read_csv('length_weight.csv', usecols=['weight'])
-
-x_train = torch.tensor(x_es).reshape(-1, 1)
-y_train = torch.tensor(y_es).reshape(-1, 1)
-
-print(x_train)
 
 class LinearRegressionModel:
     def __init__(self):
@@ -43,7 +39,7 @@ model = LinearRegressionModel()
 
 
 optimizer = torch.optim.SGD([model.W, model.b], 0.0001)
-for epoch in range(25000):
+for epoch in range(1000):
     model.loss(x_train, y_train).backward()
     optimizer.step()
 
