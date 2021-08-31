@@ -38,8 +38,8 @@ class LinearRegressionModel:
 model = LinearRegressionModel()
 
 
-optimizer = torch.optim.SGD([model.W, model.b], 0.0001)
-for epoch in range(1000):
+optimizer = torch.optim.SGD([model.W, model.b], 0.000000001)
+for epoch in range(10000):
     model.loss(x_train, y_train).backward()
     optimizer.step()
 
