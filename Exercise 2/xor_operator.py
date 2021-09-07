@@ -2,16 +2,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 x_train = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-y_train = np.array([[1], [1], [1], [0]])
+y_train = np.array([[0], [1], [1], [0]])
 
 
 def sigmoid_function(z):
     return 1 / (1 + np.e ** -z)
 
 
-class NandModel:
+class XorModel:
     def __init__(self):
-        self.W = np.array([[-14.0], [-14.0]])
+        self.W = np.array([[14.0, -14.0], [14.0, -14.0]])
         self.b = np.array([[21.0]])
 
     def f(self, x):
@@ -22,9 +22,9 @@ class NandModel:
         return -np.average(y * np.log(self.f(x)) + (1 - y) * np.log(1 - self.f(x)))
 
 
-model = NandModel()
+model = XorModel()
 
-fig = plt.figure('NAND operator')
+fig = plt.figure('XOR operator')
 
 plot = fig.add_subplot(111, projection='3d')
 
