@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 x_train = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-y_train = np.array([[1], [0], [0], [0]])
+y_train = np.array([[1], [1], [1], [0]])
 
 
 def sigmoid_function(z):
@@ -11,8 +11,8 @@ def sigmoid_function(z):
 
 class NorModel:
     def __init__(self):
-        self.W = np.array([[-10.0], [-10.0]])
-        self.b = np.array([[4.65]])
+        self.W = np.array([[-14.0], [-14.0]])
+        self.b = np.array([[21.0]])
 
     def f(self, x):
         return sigmoid_function(x @ self.W + self.b)
@@ -51,11 +51,12 @@ for i in range(0, x1_grid.shape[0]):
         y_grid[i, j] = model.f([[x1_grid[i, j], x2_grid[i, j]]])
 plot.plot_wireframe(x1_grid, x2_grid, y_grid, color='green', alpha=0.75)
 
-table = plt.table(cellText=[[0, 0, 1], [0, 1, 0], [1, 0, 0], [1, 1, 0]],
+table = plt.table(cellText=[[0, 0, 1], [0, 1, 1], [1, 0, 1], [1, 1, 0]],
                   colWidths=[0.1] * 3,
                   colLabels=["$x_1$", "$x_2$", "$f(\\mathbf{x})$"],
                   cellLoc="center",
                   loc="upper right")
+
 
 plot_info = fig.text(0.01, 0.02, "W = %s\nb = %s\nloss = %f" % (model.W, model.b, model.loss(x_train, y_train)))
 
