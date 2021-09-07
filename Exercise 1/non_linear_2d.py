@@ -1,7 +1,6 @@
 import numpy
 import torch
 import math as m
-from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 import pandas as pd
 
