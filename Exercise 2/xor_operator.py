@@ -26,7 +26,6 @@ class XorModel:
         return self.f_2(self.f_1(x))
 
     def loss(self, x, y):
-        print(1 - self.f(x))
         return -np.average(y * np.log(self.f(x)) + (1 - y) * np.log(1 - self.f(x)))
 
 

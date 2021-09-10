@@ -18,7 +18,6 @@ class NandModel:
         return sigmoid_function(x @ self.W + self.b)
 
     def loss(self, x, y):
-        print(1 - self.f(x))
         return -np.average(y * np.log(self.f(x)) + (1 - y) * np.log(1 - self.f(x)))
 
 

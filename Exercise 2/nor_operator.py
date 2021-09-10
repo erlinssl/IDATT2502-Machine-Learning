@@ -1,8 +1,9 @@
 import numpy as np
+import torch
 import matplotlib.pyplot as plt
 
-x_train = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-y_train = np.array([[1], [0], [0], [0]])
+x_train = torch.Tensor([[0., 0.], [0., 1.], [1., 0.], [1., 1.]])
+y_train = torch.Tensor([[1.], [0.], [0.], [0.]])
 
 
 def sigmoid_function(z):
@@ -11,23 +12,26 @@ def sigmoid_function(z):
 
 class NorModel:
     def __init__(self):
-        self.W = np.array([[-10.0], [-10.0]])
-        self.b = np.array([[4.65]])
+        self.W = torch.tensor([[-10.0], [-10.0]], requires_grad=True)
+        self.b = torch.tensor([[4.65]], requires_grad=True)
 
     def f(self, x):
-        return sigmoid_function(x @ self.W + self.b)
+        return sigmoid_function(torch.Tensor(x) @ self.W + self.b)
 
     def loss(self, x, y):
-        print(1 - self.f(x))
-        return -np.average(y * np.log(self.f(x)) + (1 - y) * np.log(1 - self.f(x)))
+        return -torch.mean(y * torch.log(self.f(x)) + (1 - y) * torch.log(1 - self.f(x)))
 
 
 model = NorModel()
 
+optimizer = torch.optim.SGD([model.W, model.b], 1)
+for epoch in range(10000):
+    model.loss(x_train, y_train).backward()
+    optimizer.step()
+    optimizer.zero_grad()
+
 fig = plt.figure('NOR operator')
-
 plot = fig.add_subplot(111, projection='3d')
-
 plot.set_xlabel('$x_1$')
 plot.set_ylabel('$x_2$')
 plot.set_zlabel('y')
