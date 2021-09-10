@@ -43,6 +43,7 @@ plot.set_zticks([0, 1])
 plot.set_xlim(-0.25, 1.25)
 plot.set_ylim(-0.25, 1.25)
 plot.set_zlim(-0.25, 1.25)
+fig.suptitle('NAND operator')
 
 x1_grid, x2_grid = np.meshgrid(np.linspace(-0.25, 1.25, 10), np.linspace(-0.25, 1.25, 10))
 y_grid = np.empty([10, 10])

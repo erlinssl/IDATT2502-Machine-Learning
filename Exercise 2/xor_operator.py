@@ -56,6 +56,7 @@ y_grid = np.empty([10, 10])
 
 plot.plot(x_train[:, 0].squeeze(), x_train[:, 1].squeeze(), y_train[:, 0].squeeze(),
           'o', color='blue', label='$(x_1^{(i)},x_2^{(i)},y^{(i)})$')
+fig.suptitle('XOR operator')
 
 plot_f = plot.plot_wireframe(np.array([[]]), np.array([[]]), np.array([[]]), color="green",
                              label="$\\hat y=f(\\mathbf{x})=\\sigma(\\mathbf{xW}+b)$")

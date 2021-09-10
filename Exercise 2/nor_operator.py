@@ -31,6 +31,7 @@ for epoch in range(10000):
     optimizer.zero_grad()
 
 fig = plt.figure('NOR operator')
+fig.suptitle('NOR operator')
 plot = fig.add_subplot(111, projection='3d')
 plot.set_xlabel('$x_1$')
 plot.set_ylabel('$x_2$')
