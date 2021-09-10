@@ -11,11 +11,19 @@ def sigmoid_function(z):
 
 class XorModel:
     def __init__(self):
-        self.W = np.array([[14.0, -14.0], [14.0, -14.0]])
-        self.b = np.array([[21.0]])
+        self.W = np.array([[10.0, -10], [10.0, -10]])
+        self.b = np.array([[-5.0, 15.0]])
+        self.W_2 = np.array([[10.0], [10.0]])
+        self.b_2 = np.array([[-15.0]])
+
+    def f_1(self, x):
+        return sigmoid_function(x @ self.W + self.b)
+
+    def f_2(self, h):
+        return sigmoid_function(h @ self.W_2 + self.b_2)
 
     def f(self, x):
-        return sigmoid_function(x @ self.W + self.b)
+        return self.f_2(self.f_1(x))
 
     def loss(self, x, y):
         print(1 - self.f(x))
@@ -51,13 +59,14 @@ for i in range(0, x1_grid.shape[0]):
         y_grid[i, j] = model.f([[x1_grid[i, j], x2_grid[i, j]]])
 plot.plot_wireframe(x1_grid, x2_grid, y_grid, color='green', alpha=0.75)
 
-table = plt.table(cellText=[[0, 0, 1], [0, 1, 1], [1, 0, 1], [1, 1, 0]],
+table = plt.table(cellText=[[0, 0, 0], [0, 1, 1], [1, 0, 1], [1, 1, 0]],
                   colWidths=[0.1] * 3,
                   colLabels=["$x_1$", "$x_2$", "$f(\\mathbf{x})$"],
                   cellLoc="center",
                   loc="upper right")
 
-plot_info = fig.text(0.01, 0.02, "W = %s\nb = %s\nloss = %f" % (model.W, model.b, model.loss(x_train, y_train)))
+plot_info = fig.text(0.01, 0.02, "$W_1$ = %s\n$b_1$ = %s\n$W_2$ = %s\n $b_2$ = %s\n"
+                                 "loss = %f" % (model.W, model.b, model.W_2, model.b_2, model.loss(x_train, y_train)))
 
 plot.legend(loc='upper left')
 
