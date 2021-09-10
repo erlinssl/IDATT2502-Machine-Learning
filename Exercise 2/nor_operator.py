@@ -12,8 +12,8 @@ def sigmoid_function(z):
 
 class NorModel:
     def __init__(self):
-        self.W = torch.tensor([[-10.0], [-10.0]], requires_grad=True)
-        self.b = torch.tensor([[4.65]], requires_grad=True)
+        self.W = torch.tensor([[-1.0], [-1.0]], requires_grad=True)
+        self.b = torch.tensor([[1.0]], requires_grad=True)
 
     def f(self, x):
         return sigmoid_function(torch.Tensor(x) @ self.W + self.b)

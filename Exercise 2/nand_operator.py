@@ -1,8 +1,9 @@
+import torch
 import numpy as np
 import matplotlib.pyplot as plt
 
-x_train = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-y_train = np.array([[1], [1], [1], [0]])
+x_train = torch.tensor([[0., 0.], [0., 1.], [1., 0.], [1., 1.]])
+y_train = torch.tensor([[1.], [1.], [1.], [0.]])
 
 
 def sigmoid_function(z):
@@ -11,17 +12,23 @@ def sigmoid_function(z):
 
 class NandModel:
     def __init__(self):
-        self.W = np.array([[-14.0], [-14.0]])
-        self.b = np.array([[21.0]])
+        self.W = torch.tensor([[-1.0], [-1.0]], requires_grad=True)
+        self.b = torch.tensor([[1.0]], requires_grad=True)
 
     def f(self, x):
-        return sigmoid_function(x @ self.W + self.b)
+        return sigmoid_function(torch.Tensor(x) @ self.W + self.b)
 
     def loss(self, x, y):
-        return -np.average(y * np.log(self.f(x)) + (1 - y) * np.log(1 - self.f(x)))
+        return -torch.mean(y * torch.log(self.f(x)) + (1 - y) * torch.log(1 - self.f(x)))
 
 
 model = NandModel()
+
+optimizer = torch.optim.SGD([model.W, model.b], 0.55)
+for epoch in range(10000):
+    model.loss(x_train, y_train).backward()
+    optimizer.step()
+    optimizer.zero_grad()
 
 fig = plt.figure('NAND operator')
 

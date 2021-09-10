@@ -1,8 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import torch
 
-x_train = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-y_train = np.array([[0], [1], [1], [0]])
+x_train = torch.tensor([[0., 0.], [0., 1.], [1., 0.], [1., 1.]])
+y_train = torch.tensor([[0.], [1.], [1.], [.0]])
 
 
 def sigmoid_function(z):
@@ -11,10 +12,10 @@ def sigmoid_function(z):
 
 class XorModel:
     def __init__(self):
-        self.W = np.array([[10.0, -10], [10.0, -10]])
-        self.b = np.array([[-5.0, 15.0]])
-        self.W_2 = np.array([[10.0], [10.0]])
-        self.b_2 = np.array([[-15.0]])
+        self.W = torch.tensor([[0.35, -0.21], [0.35, 0.65]], requires_grad=True)
+        self.b = torch.tensor([[-0.65, -0.93]], requires_grad=True)
+        self.W_2 = torch.tensor([[0.11], [-0.71]], requires_grad=True)
+        self.b_2 = torch.tensor([[0.93]], requires_grad=True)
 
     def f_1(self, x):
         return sigmoid_function(x @ self.W + self.b)
@@ -23,13 +24,18 @@ class XorModel:
         return sigmoid_function(h @ self.W_2 + self.b_2)
 
     def f(self, x):
-        return self.f_2(self.f_1(x))
+        return self.f_2(self.f_1(torch.Tensor(x)))
 
     def loss(self, x, y):
-        return -np.average(y * np.log(self.f(x)) + (1 - y) * np.log(1 - self.f(x)))
+        return -torch.mean(y * torch.log(self.f(x)) + (1 - y) * torch.log(1 - self.f(x)))
 
 
 model = XorModel()
+optimizer = torch.optim.SGD([model.W, model.W_2, model.b, model.b_2], 1)
+for epoch in range(75000):
+    model.loss(x_train, y_train).backward()
+    optimizer.step()
+    optimizer.zero_grad()
 
 fig = plt.figure('XOR operator')
 
@@ -65,7 +71,7 @@ table = plt.table(cellText=[[0, 0, 0], [0, 1, 1], [1, 0, 1], [1, 1, 0]],
                   loc="upper right")
 
 plot_info = fig.text(0.01, 0.02, "$W_1$ = %s\n$b_1$ = %s\n$W_2$ = %s\n $b_2$ = %s\n"
-                                 "loss = %f" % (model.W, model.b, model.W_2, model.b_2, model.loss(x_train, y_train)))
+                                 "loss = %f" % (model.W.data, model.b, model.W_2, model.b_2, model.loss(x_train, y_train)))
 
 plot.legend(loc='upper left')
 
