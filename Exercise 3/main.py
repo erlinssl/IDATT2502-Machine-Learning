@@ -39,7 +39,7 @@ class ConvolutionalNeuralNetworkModel(nn.Module):
             # b)
             nn.Flatten(),
             nn.Linear(64 * 7 * 7, 1 * 1024),
-            nn.Linear(1 * 1024, 1 * 10))
+            nn.Linear(1 * 1024, 1 * 10))  # 1 * 1024    64 * 7 * 7
 
     # Predictor
     def f(self, x):
