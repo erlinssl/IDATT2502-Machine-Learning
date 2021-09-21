@@ -15,15 +15,23 @@ class LongShortTermMemoryModel(nn.Module):
         self.cell_state = zero_state
 
     def logits(self, x):  # x shape: (sequence length, batch size, encoding size)
+        print("logits", x.shape)
         out, (self.hidden_state, self.cell_state) = self.lstm(x, (self.hidden_state, self.cell_state))
-        return self.dense(out.reshape(-1, 128))
+        print("out", out.shape)          # logits  torch.Size([7, 4,  13])
+        reshout = out.reshape(-1, 128)   # out     torch.Size([7, 4, 128])
+        print("reshout", reshout.shape)  # reshout torch.Size([28, 128])
+        dense = self.dense(reshout)      # dense   torch.Size([28,   7])
+        dense.reshape(7, -1)
+        print("dense", dense.shape)      # TODO dense needs to be
+        return dense
 
     def f(self, x):  # x shape: (sequence length, batch size, encoding size)
-        return torch.softmax(self.logits(x), dim=4)
+        return torch.softmax(self.logits(x), dim=1)
 
-    def loss(self, x,
-             y):  # x shape: (sequence length, batch size, encoding size), y shape: (sequence length, encoding size)
-        return nn.functional.cross_entropy(self.logits(x), y.argmax(1))
+    def loss(self, x, y):  # x shape: (sequence length, batch size, encoding size), y shape: (sequence length, encoding size)
+        temp = nn.functional.cross_entropy(self.logits(x), y.argmax(1))
+        print("temp over")
+        return temp
 
 
 char_encodings = [
@@ -58,50 +66,47 @@ out_encoding_size = len(out_encodings)
 emojis = ['🎩', '🐀', '🐈', '🏢', '👨', '🧢', '👦']
 
 x_train = torch.tensor([
-    [[char_encodings[3]],
-     [char_encodings[0]],
-     [char_encodings[1]],
-     [char_encodings[12]]],  # hat
-
-    [[char_encodings[4]],
-     [char_encodings[0]],
-     [char_encodings[1]],
-     [char_encodings[12]]],  # rat
-
-    [[char_encodings[2]],
-     [char_encodings[0]],
-     [char_encodings[1]],
-     [char_encodings[12]]],  # cat
-
-    [[char_encodings[5]],
-     [char_encodings[6]],
-     [char_encodings[0]],
-     [char_encodings[1]]],  # flat
-
-    [[char_encodings[7]],
-     [char_encodings[0]],
-     [char_encodings[1]],
-     [char_encodings[1]]],  # matt
-
-    [[char_encodings[2]],
-     [char_encodings[0]],
-     [char_encodings[8]],
-     [char_encodings[12]]],  # cap
-
-    [[char_encodings[9]],
-     [char_encodings[10]],
-     [char_encodings[11]],
-     [char_encodings[12]]],  # son
+    [char_encodings[3],
+     char_encodings[0],
+     char_encodings[1],
+     char_encodings[12]],  # hat
+    [char_encodings[4],
+     char_encodings[0],
+     char_encodings[1],
+     char_encodings[12]],  # rat
+    [char_encodings[2],
+     char_encodings[0],
+     char_encodings[1],
+     char_encodings[12]],  # cat
+    [char_encodings[5],
+     char_encodings[6],
+     char_encodings[0],
+     char_encodings[1]],  # flat
+    [char_encodings[7],
+     char_encodings[0],
+     char_encodings[1],
+     char_encodings[1]],  # matt
+    [char_encodings[2],
+     char_encodings[0],
+     char_encodings[8],
+     char_encodings[12]],  # cap
+    [char_encodings[9],
+     char_encodings[10],
+     char_encodings[11],
+     char_encodings[12]]  # son
 ])
+# print(x_train.shape)
+# print(encoding_size)
+# print(out_encoding_size)
 
 y_train = torch.tensor([
-    [out_encodings[0], out_encodings[0], out_encodings[0], out_encodings[0]],
-    [out_encodings[1], out_encodings[1], out_encodings[1], out_encodings[1]],
-    [out_encodings[2], out_encodings[2], out_encodings[2], out_encodings[2]],
-    [out_encodings[3], out_encodings[3], out_encodings[3], out_encodings[3]],
-    [out_encodings[4], out_encodings[4], out_encodings[4], out_encodings[4]],
-    [out_encodings[5], out_encodings[5], out_encodings[5], out_encodings[5]],
-    [out_encodings[6], out_encodings[6], out_encodings[6], out_encodings[6]]
+    out_encodings[0],
+    out_encodings[1],
+    out_encodings[2],
+    out_encodings[3],
+    out_encodings[4],
+    out_encodings[5],
+    out_encodings[6]
 ])  # emojis
 
 model = LongShortTermMemoryModel(encoding_size, out_encoding_size)
@@ -116,12 +121,12 @@ for epoch in range(500):
     if epoch % 10 == 9:
         model.reset()
         text = 'hat '
+        print("\n\n\nDOING THE THING\n\n\n")
         model.f(torch.tensor([[char_encodings[3]],
                               [char_encodings[0]],
                               [char_encodings[1]],
-                              [char_encodings[12]],
-                              ]))
-        y = model.f(torch.tensor([[char_encodings[0]]]))
-        print(y)
-        text = emojis[y.argmax(1)]
-        print(text)
+                              [char_encodings[12]]]))
+        # y = model.f(torch.tensor([[out_encodings[0]]]))
+        # print(y)
+        # text = emojis[y.argmax(1)]
+        # print(text)
