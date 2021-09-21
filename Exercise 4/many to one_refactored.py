@@ -113,48 +113,40 @@ y_train = torch.tensor([
 
 model = LongShortTermMemoryModel(encoding_size, out_encoding_size)
 
-optimizer = torch.optim.RMSprop(model.parameters(), 0.0025)
-for epoch in range(50):
+optimizer = torch.optim.RMSprop(model.parameters(), 0.001)
+for epoch in range(10000):
+    if epoch % 100 == 0:
+        print(epoch)
     model.reset()
     model.loss(x_train, y_train).backward()
     optimizer.step()
     optimizer.zero_grad()
 
-hat_tensor = torch.tensor([[char_encodings[3],
-                            char_encodings[0],
-                            char_encodings[1],
-                            char_encodings[12]]])
+# Testing
 
-rat_tensor = torch.tensor([[char_encodings[4],
-                            char_encodings[0],
-                            char_encodings[1],
-                            char_encodings[12]]])
+hat_tensor = torch.tensor([[char_encodings[3], char_encodings[0], char_encodings[1], char_encodings[12]]])
+rat_tensor = torch.tensor([[char_encodings[4], char_encodings[0], char_encodings[1], char_encodings[12]]])
+cat_tensor = torch.tensor([[char_encodings[2], char_encodings[0], char_encodings[1], char_encodings[12]]])
+flat_tensor = torch.tensor([[char_encodings[5], char_encodings[6], char_encodings[0], char_encodings[1]]])
+matt_tensor = torch.tensor([[char_encodings[7], char_encodings[0], char_encodings[1], char_encodings[1]]])
+cap_tensor = torch.tensor([[char_encodings[2], char_encodings[0], char_encodings[8], char_encodings[12]]])
+son_tensor = torch.tensor([[char_encodings[9], char_encodings[10], char_encodings[11], char_encodings[12]]])
 
-cat_tensor = torch.tensor([[char_encodings[2],
-                            char_encodings[0],
-                            char_encodings[1],
-                            char_encodings[12]]])
+rt_tensor = torch.tensor([[char_encodings[4], char_encodings[1], char_encodings[12], char_encodings[12]]])
+rats_tensor = torch.tensor([[char_encodings[4], char_encodings[0], char_encodings[1], char_encodings[9]]])
 
-flat_tensor = torch.tensor([[char_encodings[5],
-                            char_encodings[6],
-                            char_encodings[0],
-                            char_encodings[1]]])
+task_tensors = {rt_tensor, rats_tensor}
+for tensor in task_tensors:
+    y = model.f(tensor)
+    print(y)
+    print(emojis[y.argmax(1)])
+    print("\n")
 
-matt_tensor = torch.tensor([[char_encodings[7],
-                            char_encodings[0],
-                            char_encodings[1],
-                            char_encodings[1]]])
+print("\n\nOTHER TESTING\n\n")
 
-cap_tensor = torch.tensor([[char_encodings[2],
-                            char_encodings[0],
-                            char_encodings[8],
-                            char_encodings[12]]])
-
-son_tensor = torch.tensor([[char_encodings[9],
-                            char_encodings[10],
-                            char_encodings[11],
-                            char_encodings[12]]])
-
-y = model.f(cat_tensor)
-print(y)
-print(emojis[y.argmax(1)])
+tensors = {hat_tensor, rat_tensor, cat_tensor, flat_tensor, matt_tensor, cap_tensor, son_tensor}
+for tensor in tensors:
+    y = model.f(tensor)
+    print(y)
+    print(emojis[y.argmax(1)])
+    print("\n")
