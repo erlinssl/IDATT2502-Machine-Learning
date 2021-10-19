@@ -126,10 +126,16 @@ son_tensor = ('son ', torch.tensor([[char_encodings[9], char_encodings[10], char
 tensors = [hat_tensor, rat_tensor, cat_tensor, flat_tensor, matt_tensor, cap_tensor, son_tensor]
 
 model = LongShortTermMemoryModel(encoding_size, out_encoding_size)
-temp = ('hat', torch.tensor([[char_encodings[3], char_encodings[0], char_encodings[1], char_encodings[12]]]))
-optimizer = torch.optim.RMSprop(model.parameters(), 0.005)
+# temp = ('hat', torch.tensor([[char_encodings[3], char_encodings[0], char_encodings[1], char_encodings[12]]]))
+optimizer = torch.optim.RMSprop(model.parameters(), 0.01)
+
 for epoch in range(52):
-    if epoch % 10 == 1:
+    model.reset()
+    model.loss(x_train, y_train).backward()
+    optimizer.step()
+    optimizer.zero_grad()
+
+    if epoch % 10 == 0:
         print("epoch", epoch)
         rd.shuffle(tensors)
         for tensor in tensors:
@@ -150,11 +156,6 @@ for epoch in range(52):
         # print("cap ", emojis[y.argmax(1)])
         # y = model.f(torch.tensor([[char_encodings[9], char_encodings[10], char_encodings[11], char_encodings[12]]]))
         # print("son ", emojis[y.argmax(1)], "\n")
-
-    model.reset()
-    model.loss(x_train, y_train).backward()
-    optimizer.step()
-    optimizer.zero_grad()
 
 # Testing
 
