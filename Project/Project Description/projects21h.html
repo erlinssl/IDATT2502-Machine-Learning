@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en"><script>(function(){class RuffleMimeType{constructor(a,b,c){this.type=a,this.description=b,this.suffixes=c}}class RuffleMimeTypeArray{constructor(a){this.__mimetypes=[],this.__named_mimetypes={};for(let b of a)this.install(b)}install(a){let b=this.__mimetypes.length;this.__mimetypes.push(a),this.__named_mimetypes[a.type]=a,this[a.type]=a,this[b]=a}item(a){return this.__mimetypes[a]}namedItem(a){return this.__named_mimetypes[a]}get length(){return this.__mimetypes.length}}class RufflePlugin extends RuffleMimeTypeArray{constructor(a,b,c,d){super(d),this.name=a,this.description=b,this.filename=c}install(a){a.enabledPlugin||(a.enabledPlugin=this),super.install(a)}}class RufflePluginArray{constructor(a){this.__plugins=[],this.__named_plugins={};for(let b of a)this.install(b)}install(a){let b=this.__plugins.length;this.__plugins.push(a),this.__named_plugins[a.name]=a,this[a.name]=a,this[b]=a}item(a){return this.__plugins[a]}namedItem(a){return this.__named_plugins[a]}get length(){return this.__plugins.length}}const FLASH_PLUGIN=new RufflePlugin("Shockwave Flash","Shockwave Flash 32.0 r0","ruffle.js",[new RuffleMimeType("application/futuresplash","Shockwave Flash","spl"),new RuffleMimeType("application/x-shockwave-flash","Shockwave Flash","swf"),new RuffleMimeType("application/x-shockwave-flash2-preview","Shockwave Flash","swf"),new RuffleMimeType("application/vnd.adobe.flash-movie","Shockwave Flash","swf")]);function install_plugin(a){navigator.plugins.install||Object.defineProperty(navigator,"plugins",{value:new RufflePluginArray(navigator.plugins),writable:!1}),navigator.plugins.install(a),0<a.length&&!navigator.mimeTypes.install&&Object.defineProperty(navigator,"mimeTypes",{value:new RuffleMimeTypeArray(navigator.mimeTypes),writable:!1});for(var b=0;b<a.length;b+=1)navigator.mimeTypes.install(a[b])}install_plugin(FLASH_PLUGIN);})();</script><script src="projects21h_files/ruffle.js"></script><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <title>projects21h</title>
+  <link rel="icon" href="https://folk.ntnu.no/eidheim/grip/static/favicon.ico">
+  <link rel="stylesheet" href="projects21h_files/frameworks-f8b9580b3a0820d152c1d3c6f3ebeaa3.css">
+  <link rel="stylesheet" href="projects21h_files/behaviors-8d9cf3187e56b7b21514050253f9c9b1.css">
+  <link rel="stylesheet" href="projects21h_files/github-805c987f1ff712a0161914502c94d38b.css">
+  <link rel="stylesheet" href="projects21h_files/octicons.css">
+  <style>
+    /* Page tweaks */
+    .preview-page {
+      margin-top: 64px;
+    }
+    /* User-content tweaks */
+    .timeline-comment-wrapper > .timeline-comment:after,
+    .timeline-comment-wrapper > .timeline-comment:before {
+      content: none;
+    }
+    /* User-content overrides */
+    .discussion-timeline.wide {
+      width: 920px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div id="preview-page" class="preview-page" data-autorefresh-url="">
+
+    
+
+      <div role="main" class="main-content">
+        <div class="container new-discussion-timeline experiment-repo-nav">
+          <div class="repository-content">
+            <div id="readme" class="readme boxed-group clearfix announce instapaper_body md">
+              
+                <h3>
+                  <span class="octicon octicon-book"></span>
+                  projects21h
+                </h3>
+              
+              <article class="markdown-body entry-content" itemprop="text" id="grip-content">
+                <h1>
+<a id="user-content-om-prosjektet" class="anchor" href="#om-prosjektet" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Om prosjektet</h1>
+<p>Studentene velger selv prosjektoppgave. Se under for foreslåtte problemstillinger.</p>
+<p>Målet med prosjektoppgaven er at dere får erfaring med å løse et eller flere gitte praktiske
+problemstillinger ved hjelp av maskinlæring. Metodene dere bruker kan være de dere har lært i
+undervisningen/øvingene, eller nye metoder dere setter dere inn i.</p>
+<p>Dere får karakter ut i fra jobben dere gjør, og selv om dere ikke oppnår ønsket resultat så er det
+likevel mulig å oppnå karakteren A. Med andre ord, noen problemstillinger kan være vanskelig å løse
+på en tilfredstillende måte, men letingen etter løsningen og konklusjonen fra resultatene kan
+fortsatt være svært interessant.</p>
+<ul>
+<li>Gruppestørrelse: 1-4 studenter</li>
+<li>Oppstart: 19.10</li>
+<li>Presentasjon: kommer senere</li>
+<li>Innlevering: kommer senere
+<ul>
+<li>Skriv en liten oppsummering av arbeidet hver/annenhver uke (1-2 sider)
+<ul>
+<li>i oppsummeringene får dere skrevet om arbeid som ikke nødvendigvis blir med i rapporten</li>
+</ul>
+</li>
+<li>Rapport
+<ul>
+<li>typisk struktur:&nbsp;introduksjon, tidligere relevant arbeid, metode, resultat, diskusjon,
+konklusjon og referanser</li>
+<li>ta utgangspunkt i at leseren tar/har tatt dette faget (IDATT2502)</li>
+</ul>
+</li>
+<li>oppsummeringene, rapporten og kildekoden leveres på Blackboard som en komprimert fil</li>
+</ul>
+</li>
+<li>Møter med veileder hver/annenhver uke</li>
+</ul>
+<h1>
+<a id="user-content-prosjektoppgaver" class="anchor" href="#prosjektoppgaver" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Prosjektoppgaver</h1>
+<p>Velg en av oppgavene nedenfor, og send oppgave-tittel med eventuell prosjektbeskrivelse og deltakere
+(fullt navn og epost) til <a href="mailto:ole.c.eidheim@ntnu.no">ole.c.eidheim@ntnu.no</a>.</p>
+<h2>
+<a id="user-content-frivillig-oppgave" class="anchor" href="#frivillig-oppgave" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Frivillig oppgave</h2>
+<p>Veileder: tildelt etter kompetanse</p>
+<p>Dere kan i samarbeid med en veileder (Ole, Donn, Jonathan eller&nbsp;Martin) lage deres egen oppgave.
+Send da en kort prosjektbeskrivelse til <a href="mailto:ole.c.eidheim@ntnu.no">ole.c.eidheim@ntnu.no</a>.</p>
+<p>For inspirasjon til å finne en motiverende prosjektoppgave, kan dere se på tilgjengelige datasett,
+for eksempel:</p>
+<ul>
+<li><a href="https://www.kaggle.com/datasets" rel="nofollow">https://www.kaggle.com/datasets</a></li>
+<li><a href="https://toolbox.google.com/datasetsearch" rel="nofollow">https://toolbox.google.com/datasetsearch</a></li>
+</ul>
+<p>I tilfellet dere vil utforske andre maskinlæringsmetoder som et forprosjekt til en spesifikk
+bachelor-oppgave innen maskinlæring, kan rapporten også skrives som en&nbsp;review article.</p>
+<h2>
+<a id="user-content-gpucpu-parallellisering" class="anchor" href="#gpucpu-parallellisering" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>GPU/CPU parallellisering</h2>
+<p>Veileder: Ole C. Eidheim</p>
+<p>Målet er å parallellisere en eller flere <em>lokale</em> læringsalgoritmer på grafikkort eller gjennom CPU
+tråder. <em>Lokale</em> læringsalgoritmer er et alternativ til ende til ende optimalisering av
+maskinlæringsmodeller gjennom backprop (som dere brukte i de 4 første ukene), der justeringen av
+vektene for et lag kun er avhengig av input til laget og laget selv. Dette er læringsalgoritmer som
+er mer biologisk plausible, men slike algoritmer er ikke støttet godt i rammeverk som PyTorch.</p>
+<p>Velg enten oppgave 1 eller 2:</p>
+<ul>
+<li>Oppgave 1: Dette prosjektet kan fungere som litteraturstudie på GPU programmeringsbibliotek med
+sikte på å jobbe videre med problemstillingen i bacheloroppgaven.</li>
+<li>Oppgave 2: Parallellisere <a href="https://en.wikipedia.org/wiki/Oja%27s_rule" rel="nofollow">Oja's learning rule</a>:
+<a href="https://camo.githubusercontent.com/a84fe7955d1e63e492a5e99549dc4284fef8ded587d37a921684cf87b6b134d7/68747470733a2f2f77696b696d656469612e6f72672f6170692f726573745f76312f6d656469612f6d6174682f72656e6465722f7376672f31336436626338646133313830643163623832336161396162313935636138343930613235336633" target="_blank" rel="nofollow"><img src="projects21h_files/13d6bc8da3180d1cb823aa9ab195ca8490a253f3.svg" alt="" data-canonical-src="https://wikimedia.org/api/rest_v1/media/math/render/svg/13d6bc8da3180d1cb823aa9ab195ca8490a253f3" style="max-width:100%;"></a>.
+<ul>
+<li>Merk at w_i er her et element i vektoren <strong>w</strong>, og at denne læringsregelen fungerer på en <strong>w</strong>
+uavhengig av andre <strong>w</strong>.</li>
+<li>Initialiser flere <strong>w</strong>'er med tilfeldige tall (for eksempel mellom 0 og 1, men husk da å dele
+verdiene i MNIST på 255.0)</li>
+<li>Dere kan her for eksempel jobbe med MNIST datasettet, trekke ut tilfeldige 5x5 regioner fra
+datasettet, og bruke disse regionene som input (x) i algoritmen. Dette vil danne første laget i
+en CNN arkitektur, der de ulike vektene <strong>w</strong> tilsvarer filtrene.
+<ul>
+<li>Dette kan gjøres i flere lag der dere trener først første laget for seg, og deretter neste lag
+for seg (vektene i første laget er da låst). Dette er kun aktuelt for læringsregelen fra
+Decorrelated Hebbian Learning for Clustering and Function Approximation (se under).</li>
+</ul>
+</li>
+<li>Etter å ha parallellisert Oja's learning rule, kan dere prøve å parallellisere læringsregelen
+gitt i Decorrelated Hebbian Learning for Clustering and Function Approximation (du finner denne
+artikkelen i Prosjekt-mappen på blackboard):
+<a href="https://camo.githubusercontent.com/5e9f2661a1be1471241df3a4a0581d675e2d37e1d96469f2b79763249bc2d43d/68747470733a2f2f6c617465782e636f6465636f67732e636f6d2f7376672e696d6167653f775f69286e2673706163653b26706c75733b2673706163653b31292673706163653b3d2673706163653b775f69286e292673706163653b26706c75733b2673706163653b5c6574612673706163653b795f69286e2c2673706163653b78292673706163653b28782673706163653b2d2673706163653b775f69286e29292673706163653b28795f69286e2c2673706163653b78292673706163653b2d2673706163653b5c73756d5f6b2673706163653b795f6b286e2c2673706163653b78295e3229" target="_blank" rel="nofollow"><img src="projects21h_files/svg_002.svg" title="w_i(n + 1) = w_i(n) + \eta y_i(n, x) (x - w_i(n)) (y_i(n, x) - \sum_k y_k(n, x)^2)" data-canonical-src="https://latex.codecogs.com/svg.image?w_i(n&amp;space;&amp;plus;&amp;space;1)&amp;space;=&amp;space;w_i(n)&amp;space;&amp;plus;&amp;space;\eta&amp;space;y_i(n,&amp;space;x)&amp;space;(x&amp;space;-&amp;space;w_i(n))&amp;space;(y_i(n,&amp;space;x)&amp;space;-&amp;space;\sum_k&amp;space;y_k(n,&amp;space;x)^2)" style="max-width:100%;"></a>,
+der
+<a href="https://camo.githubusercontent.com/e07c64e28a6b97dcb9a84ae7a7719caa171c8eb403d1ade12281a681d3c96f85/68747470733a2f2f6c617465782e636f6465636f67732e636f6d2f7376672e696d6167653f795f69286e2c2673706163653b78292673706163653b3d2673706163653b5c667261637b655e7b2d7c782673706163653b2d2673706163653b775f69286e297c5e7b327d2f5c7369676d617d7d7b5c73756d5f6b2673706163653b655e7b2d7c782673706163653b2d2673706163653b775f6b286e297c5e7b327d2f5c7369676d617d7d" target="_blank" rel="nofollow"><img src="projects21h_files/svg.svg" title="y_i(n, x) = \frac{e^{-|x - w_i(n)|^{2}/\sigma}}{\sum_k e^{-|x - w_k(n)|^{2}/\sigma}}" data-canonical-src="https://latex.codecogs.com/svg.image?y_i(n,&amp;space;x)&amp;space;=&amp;space;\frac{e^{-|x&amp;space;-&amp;space;w_i(n)|^{2}/\sigma}}{\sum_k&amp;space;e^{-|x&amp;space;-&amp;space;w_k(n)|^{2}/\sigma}}" style="max-width:100%;"></a>
+<ul>
+<li>Merk at <strong>w_i</strong>(n) er her en vektor ved tidssteg n.</li>
+</ul>
+</li>
+<li>Denne oppgaven kan også utvides til bacheloroppgave</li>
+</ul>
+</li>
+</ul>
+<h2>
+<a id="user-content-klassifisering-av-for-eksempel-roterte-eller-skalerte-tall" class="anchor" href="#klassifisering-av-for-eksempel-roterte-eller-skalerte-tall" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Klassifisering av for eksempel roterte eller skalerte tall</h2>
+<p>Veileder: Ole C. Eidheim</p>
+<p>Å lage modeller som er invariant i forhold til for eksempel rotasjon er noe som fortsatt jobbes med.
+I denne oppgaven skal dere snu litt på denne problemstillingen, og i stedet søke etter rotasjoner
+som gir høyest klassifiseringsscore (høyest "sannsynlighet" etter softmax) av allerede roterte tall.
+Søket vil bli gjort gjennom optimaliseringsmetoder dere tidligere har brukt, for eksempel SGD eller
+Adam.</p>
+<p>Dere kan først enten trene deres egen MNIST CNN modell (med ikke-roterte tall), eller ta
+utgangspunkt i en ferdig trent CNN modell. Hvis dere bruker en ferdig trent modell, ta bort alle CNN
+lagene bortsett fra de 3-4 første lagene, der det første laget tar imot input x. Deretter skal dere
+låse vektene i modellen, legge til for eksempel en rotasjonsmatrise mellom x og det første CNN
+laget, og søke etter rotasjonsmatrisen som gir høyest klassifiseringsscore for et nytt allerede
+rotert tall x. Dere kan her først ta utgangspunkt i at dere allerede vet hvilke tall som er rotert.</p>
+<h2>
+<a id="user-content-automatic-detection-and-annotation-of-ads-in-podcasts" class="anchor" href="#automatic-detection-and-annotation-of-ads-in-podcasts" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Automatic detection and annotation of ads in podcasts</h2>
+<p>Supervisor: Donn Morrison</p>
+<p>The aim is to detect and annotate podcast audio files automatically and dynamically such that the
+advertisements can be easily skipped or cropped from the file. Implementation could be a podcast
+proxy server that strips ads dynamically as they are downloaded. Some ideas for starting are:</p>
+<ul>
+<li>A short survey on types of podcast ads (e.g., dynamically inserted based on IP address
+(acast.com), ads spoken by podcast host, ads spoken by person who is not the podcast host, etc.)</li>
+<li>Speech recognition on the podcast audio, followed by topical segmentation with the asusmption that
+ads will contain different words</li>
+<li>Speech recognition followed by sentence segmentation and classification (ad vs not ad) by using a
+small training set</li>
+<li>See the Adblock Radio project: <a href="https://www.adblockradio.com/en/" rel="nofollow">https://www.adblockradio.com/en/</a>
+</li>
+</ul>
+<h2>
+<a id="user-content-adversarial-machine-learning-hacking-trained-models" class="anchor" href="#adversarial-machine-learning-hacking-trained-models" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Adversarial machine learning: Hacking trained models</h2>
+<p>Supervisor: Donn Morrison</p>
+<p>There are many pretrained models available. Can you trick them into reliably misclassifying unseen
+examples? For example, what modifications can you make to traffic signs that are imperceptable to
+the human eye but that fool autonomous vehicles? What ethical implications are there if these models
+are deployed in society? How can our bug hunting methodologies (eg., red-teaming &amp; penetration
+testing) be adapted to adversarial machine learning?</p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Adversarial_machine_learning" rel="nofollow">https://en.wikipedia.org/wiki/Adversarial_machine_learning</a></li>
+<li><a href="https://nvlpubs.nist.gov/nistpubs/ir/2019/NIST.IR.8269-draft.pdf" rel="nofollow">https://nvlpubs.nist.gov/nistpubs/ir/2019/NIST.IR.8269-draft.pdf</a></li>
+<li>NeurIPS 2018 tutorial on adversarial robustness: <a href="https://www.youtube.com/watch?v=TwP-gKBQyic" rel="nofollow">https://www.youtube.com/watch?v=TwP-gKBQyic</a>
+</li>
+</ul>
+<h2>
+<a id="user-content-applications-of-machine-learning-to-reverse-engineering" class="anchor" href="#applications-of-machine-learning-to-reverse-engineering" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Applications of machine learning to reverse engineering</h2>
+<p>Supervisor: Donn Morrison</p>
+<p>Consider a binary program X for which we do not know the instruction set architecture (ISA). We may
+see patterns in the program's binary data but we do not know what those patterns mean. Can we learn
+ISA properties from programs with known ISAs and transfer that knowledge to the program X to
+discover (among other things):</p>
+<ul>
+<li>Instruction format</li>
+<li>Memory bus width/register sizes (8-, 16-, 32-, or 64-bit)</li>
+<li>Encodings of frequent instructions (JMP, LOAD, STORE, ADD, etc.)</li>
+<li>Number of CPU registers</li>
+</ul>
+<h2>
+<a id="user-content-software-vulnerability-detection-in-source-code" class="anchor" href="#software-vulnerability-detection-in-source-code" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Software vulnerability detection in source code</h2>
+<p>Supervisor: Donn Morrison</p>
+<p>Bug hunting takes a lot of time. What are the recent advances in using machine learning for bug
+hunting where source code is available? Implement such a technique (possibly restricted to one
+programming language), train it with as much data as possible, and test it on patched and unpatched
+code samples where a bug has been found and fixed.</p>
+<ul>
+<li><a href="https://sci-hub.se/10.1109/MALTESQUE.2017.7882012" rel="nofollow">https://sci-hub.se/10.1109/MALTESQUE.2017.7882012</a></li>
+<li><a href="https://resources.github.com/whitepapers/How-GitHub-secures-open-source-software/">https://resources.github.com/whitepapers/How-GitHub-secures-open-source-software/</a></li>
+<li><a href="https://www.microsoft.com/security/blog/2020/04/16/secure-software-development-lifecycle-machine-learning/" rel="nofollow">https://www.microsoft.com/security/blog/2020/04/16/secure-software-development-lifecycle-machine-learning/</a></li>
+</ul>
+<h2>
+<a id="user-content-reinforcement-learning" class="anchor" href="#reinforcement-learning" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Reinforcement Learning</h2>
+<p>Veileder: Jonathan Jørgensen</p>
+<p>Velg (eller lag) et environment, og løs det med valgfri reinforcement learning-algoritme. Deretter
+kan man finne seg et spesifikt fokus i problemstillingen, f.eks. "Hvilken effekt har disse
+hyperparameterne på treningen og resultatet?" eller "Hvor likt vil to separat trente agenter oppføre
+seg?". Problemstilligen kan starte ganske generell (typ "spill tetris med DQN") og dermed spisses
+etterhvert i samarbeid med veileder.</p>
+<p>For å finne ferdige environments kan dere sjekke ut OpenAI gym: <a href="https://gym.openai.com/" rel="nofollow">https://gym.openai.com/</a>. Dersom dere
+ønsker mer spenstige environment, slik som super mario, så kan dere søke på f.eks. github om det er
+noen som har laget det, bare pass på at det er kompatibelt med OpenAI-standarden for environments,
+da det gjør alt mye lettere.</p>
+<h2>
+<a id="user-content-trafikkskilt" class="anchor" href="#trafikkskilt" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Trafikkskilt</h2>
+<p>Veileder: Martin Johannes Nilsen</p>
+<p>I denne oppgaven er det tenkt at en skal ta i bruk datasyn til å klassifisere trafikkskilt. Et
+eksempel på et relevant datasett er "German Traffic Sign Recognition Benchmark (GTSRB)"
+<a href="https://www.kaggle.com/meowmeowmeowmeowmeow/gtsrb-german-traffic-sign" rel="nofollow">https://www.kaggle.com/meowmeowmeowmeowmeow/gtsrb-german-traffic-sign</a>. Visualiser datasettet, og lag
+en modell som klarer å klassifisere et vilkårlig innsendt bilde. Klarer en for eksempel å
+klassifisere norske veiskilt, basert på trening på tyske? Sammenlikn gjerne ulike modeller opp mot
+hverandre - hvilke fungerer best, og hvorfor?</p>
+<h2>
+<a id="user-content-språkdeteksjon" class="anchor" href="#spr%C3%A5kdeteksjon" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Språkdeteksjon</h2>
+<p>Veileder: Martin Johannes Nilsen</p>
+<p>Naturlig språk kan by på problemer når en ønsker å klassifisere tekst. I denne oppgaven skal du
+trene en modell på språkdata, og se om du klarer å få den til å klassifisere riktig språk på ny,
+usett data. Et eksempel på datasett er:
+<a href="https://www.kaggle.com/zarajamshaid/language-identification-datasst" rel="nofollow">https://www.kaggle.com/zarajamshaid/language-identification-datasst</a>. En spennende variant av denne
+oppgaven kan være å se om en maskinlæringsmodell for eksempel kan se forskjell på bokmål og nynorsk?
+Eller forskjell på dansk og norsk?</p>
+
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    
+
+  </div>
+  <div>&nbsp;</div>
+  </div><script>
+    function showCanonicalImages() {
+      var images = document.getElementsByTagName('img');
+      if (!images) {
+        return;
+      }
+      for (var index = 0; index < images.length; index++) {
+        var image = images[index];
+        if (image.getAttribute('data-canonical-src') && image.src !== image.getAttribute('data-canonical-src')) {
+          image.src = image.getAttribute('data-canonical-src');
+        }
+      }
+    }
+
+    function scrollToHash() {
+      if (location.hash && !document.querySelector(':target')) {
+        var element = document.getElementById('user-content-' + location.hash.slice(1));
+        if (element) {
+           element.scrollIntoView();
+        }
+      }
+    }
+
+    function autorefreshContent(eventSourceUrl) {
+      var initialTitle = document.title;
+      var contentElement = document.getElementById('grip-content');
+      var source = new EventSource(eventSourceUrl);
+      var isRendering = false;
+
+      source.onmessage = function(ev) {
+        var msg = JSON.parse(ev.data);
+        if (msg.updating) {
+          isRendering = true;
+          document.title = '(Rendering) ' + document.title;
+        } else {
+          isRendering = false;
+          document.title = initialTitle;
+          contentElement.innerHTML = msg.content;
+          showCanonicalImages();
+        }
+      }
+
+      source.onerror = function(e) {
+        if (e.readyState === EventSource.CLOSED && isRendering) {
+          isRendering = false;
+          document.title = initialTitle;
+        }
+      }
+    }
+
+    window.onhashchange = function() {
+      scrollToHash();
+    }
+
+    window.onload = function() {
+      scrollToHash();
+    }
+
+    showCanonicalImages();
+
+    var autorefreshUrl = document.getElementById('preview-page').getAttribute('data-autorefresh-url');
+    if (autorefreshUrl) {
+      autorefreshContent(autorefreshUrl);
+    }
+  </script>
+
+</body></html>
