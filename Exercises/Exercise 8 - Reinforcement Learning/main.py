@@ -52,17 +52,29 @@ from sklearn.preprocessing import KBinsDiscretizer
 
 env = gym.make('CartPole-v0')
 
-# /cart position, cart velocity,/ pole angle, pole velocity
+# pole angle, angular velocity
 n_bins = (6, 12)
-lower_bounds = [env.observation_space.low[2], -math.radians(12)]
-upper_bounds = [env.observation_space.high[2], math.radians(12)]
+lower_bounds = [env.observation_space.low[2], -math.radians(24)]
+upper_bounds = [env.observation_space.high[2], math.radians(24)]
+
+# cart position, cart velocity, pole angle, pole velocity
+# n_bins = (12, 6, 6, 12)
+# lower_bounds = [env.observation_space.low[0], env.observation_space.low[0]/2,
+#                 env.observation_space.low[2], -math.radians(24)]
+# upper_bounds = [env.observation_space.high[0], env.observation_space.high[0]/2,
+#                 env.observation_space.high[2], math.radians(24)]
+
 Q = np.zeros(n_bins + (env.action_space.n,))
+print(lower_bounds)
+print(upper_bounds)
+print(Q.shape)
 
 
-def discretizer(cart_pos, car_vel, angle, pole_velocity) -> Tuple[int, ...]:
+def discretizer(cart_pos, cart_vel, angle, pole_velocity) -> Tuple[int, ...]:
     est = KBinsDiscretizer(n_bins=n_bins, encode='ordinal', strategy='uniform')
     est.fit([lower_bounds, upper_bounds])
     return tuple(map(int, est.transform([[angle, pole_velocity]])[0]))
+    # return tuple(map(int, est.transform([[cart_pos, cart_vel, angle, pole_velocity]])[0]))
 
 
 def next_action(state: tuple):
@@ -83,6 +95,7 @@ def exploration_rate(n: int, min_rate=0.1) -> float:
     return max(min_rate, min(1, 1.0 - np.log10((n + 1) / 25)))
 
 
+time.sleep(1)
 for i_episode in range(1000):
     current_state, done = discretizer(*env.reset()), False
 
@@ -107,14 +120,14 @@ for i_episode in range(1000):
         current_state = new_state
 
         if i_episode % 50 == 0:
-            time.sleep(0.0001)
+            time.sleep(0.001)
         if done:
             if t == 199:
                 print("Episode {epinum: <3} completed the exercise with {exposteps: <3} explorational steps"
                       .format(epinum=i_episode, exposteps=ex))
+                time.sleep(0.01)
                 break
-            print("Episode {epinum: <2} finished after {tsteps: <3} timesteps, with {exposteps: <3} explorational steps"
+            print("Episode {epinum: <3} failed after {tsteps: <3} timesteps, with {exposteps: <3} explorational steps"
                   .format(epinum=i_episode, tsteps=(t + 1), exposteps=ex))
-            time.sleep(0.05)
             break
 env.close()
