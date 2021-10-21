@@ -92,10 +92,9 @@ def exploration_rate(n: int, min_rate=0.1) -> float:
     return max(min_rate, min(1, 1.0 - np.log10((n + 1) / 25)))
 
 
-time.sleep(1)
+scores = [0] * 100
 for i_episode in range(1000):
     current_state, done = discretizer(*env.reset()), False
-
     ex = 0
     for t in range(200):
         # env.render()
@@ -116,13 +115,14 @@ for i_episode in range(1000):
 
         current_state = new_state
 
-        if i_episode % 50 == 0:
-            time.sleep(0.001)
         if done:
+            scores[i_episode % 100] = (t+1)
             if t == 199:
-                print("Episode {epinum: <3} completed the exercise with {exposteps: <2} explorational steps"
-                      .format(epinum=i_episode, exposteps=ex))
-                time.sleep(0.01)
+                avg = np.average(scores)
+                print("Episode {epinum: <3} completed the exercise with {exposteps: <2} explorational steps. {}"
+                      "         Average past 100 runs: {avg: <3}"
+                      .format(t, epinum=i_episode, exposteps=ex, avg=avg))
+                # time.sleep(0.01)
                 break
             print("Episode {epinum: <3} failed after {tsteps: <3} timesteps, with {exposteps: <2} explorational steps"
                   .format(epinum=i_episode, tsteps=(t + 1), exposteps=ex))
