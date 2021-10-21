@@ -54,8 +54,8 @@ env = gym.make('CartPole-v0')
 
 # pole angle, angular velocity
 n_bins = (6, 12)
-lower_bounds = [env.observation_space.low[2], -math.radians(24)]
-upper_bounds = [env.observation_space.high[2], math.radians(24)]
+lower_bounds = [env.observation_space.low[2], -math.radians(12)]
+upper_bounds = [env.observation_space.high[2], math.radians(12)]
 
 # cart position, cart velocity, pole angle, pole velocity
 # n_bins = (12, 6, 6, 12)
@@ -65,9 +65,6 @@ upper_bounds = [env.observation_space.high[2], math.radians(24)]
 #                 env.observation_space.high[2], math.radians(24)]
 
 Q = np.zeros(n_bins + (env.action_space.n,))
-print(lower_bounds)
-print(upper_bounds)
-print(Q.shape)
 
 
 def discretizer(cart_pos, cart_vel, angle, pole_velocity) -> Tuple[int, ...]:
@@ -101,7 +98,7 @@ for i_episode in range(1000):
 
     ex = 0
     for t in range(200):
-        env.render()
+        # env.render()
 
         action = next_action(current_state)
         obs, rew, done, info = env.step(action)
@@ -123,11 +120,11 @@ for i_episode in range(1000):
             time.sleep(0.001)
         if done:
             if t == 199:
-                print("Episode {epinum: <3} completed the exercise with {exposteps: <3} explorational steps"
+                print("Episode {epinum: <3} completed the exercise with {exposteps: <2} explorational steps"
                       .format(epinum=i_episode, exposteps=ex))
                 time.sleep(0.01)
                 break
-            print("Episode {epinum: <3} failed after {tsteps: <3} timesteps, with {exposteps: <3} explorational steps"
+            print("Episode {epinum: <3} failed after {tsteps: <3} timesteps, with {exposteps: <2} explorational steps"
                   .format(epinum=i_episode, tsteps=(t + 1), exposteps=ex))
             break
 env.close()
