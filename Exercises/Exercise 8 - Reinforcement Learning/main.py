@@ -119,9 +119,9 @@ for i_episode in range(1000):
             scores[i_episode % 100] = (t+1)
             if t == 199:
                 avg = np.average(scores)
-                print("Episode {epinum: <3} completed the exercise with {exposteps: <2} explorational steps. {}"
+                print("Episode {epinum: <3} completed the exercise with {exposteps: <2} explorational steps."
                       "         Average past 100 runs: {avg: <3}"
-                      .format(t, epinum=i_episode, exposteps=ex, avg=avg))
+                      .format(epinum=i_episode, exposteps=ex, avg=avg))
                 # time.sleep(0.01)
                 break
             print("Episode {epinum: <3} failed after {tsteps: <3} timesteps, with {exposteps: <2} explorational steps"
