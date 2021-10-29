@@ -97,7 +97,7 @@ for i_episode in range(1000):
     current_state, done = discretizer(*env.reset()), False
     ex = 0
     for t in range(200):
-        # env.render()
+        env.render()
 
         action = next_action(current_state)
         obs, rew, done, info = env.step(action)

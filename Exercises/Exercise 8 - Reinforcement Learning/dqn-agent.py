@@ -61,9 +61,9 @@ def select_action(state):
 
 
 def learn():
-    if len(memory) < 64:
+    if len(memory) < 16:
         return
-    transitions = memory.sample(64)
+    transitions = memory.sample(16)
     batch_current_state, batch_action, batch_next_state, batch_reward = zip(*transitions)
 
     batch_current_state = torch.cat(batch_current_state)
@@ -82,7 +82,7 @@ def learn():
     optimizer.step()
 
 
-for i_episode in range(50):
+for i_episode in range(100):
     current_state = env.reset()
 
     for t in range(200):
