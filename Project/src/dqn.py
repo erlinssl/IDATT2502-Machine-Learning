@@ -1,3 +1,5 @@
+import time
+
 from nes_py.wrappers import JoypadSpace
 import os
 import gym_tetris
