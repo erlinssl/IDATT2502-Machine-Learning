@@ -1,13 +1,16 @@
+from nes_py.wrappers import JoypadSpace
 import os
+import gym_tetris
+from gym_tetris.actions import SIMPLE_MOVEMENT
 import random
 from collections import deque
-
-import gym
 import numpy as np
+
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
+import torch.nn.functional as F
+
 
 TRAIN_PATH = os.path.join(os.path.dirname(__file__), 'trained_model.pt')
 
@@ -30,12 +33,14 @@ class ReplayMemory:
 
 
 class DQNAgent(nn.Module):
-    def __init__(self, action_space, in_channels=4):
+    def __init__(self, action_space, in_channels=9):
         super(DQNAgent, self).__init__()
+        print(action_space)
         self.dense = nn.Linear(in_channels, 256)
         self.dense2 = nn.Linear(256, action_space)
 
     def forward(self, x):
+        print(x.shape)
         x = F.relu(self.dense(x))
         x = F.relu(self.dense2(x))
         return x
@@ -45,19 +50,18 @@ class DQNAgent(nn.Module):
             os.makedirs(os.path.dirname(TRAIN_PATH))
 
         torch.save(model.state_dict(), TRAIN_PATH)
-        print("Model saved!")
 
     def load(self):
-        self.load_state_dict(torch.load(TRAIN_PATH))
-        print("Model loaded!")
+        model = DQNAgent(nn.Module)
+        model.load_state_dict(torch.load(TRAIN_PATH))
         model.eval()
 
 
-env = gym.make('CartPole-v0')
+env = gym_tetris.make('TetrisA-v0')
+env = JoypadSpace(env, SIMPLE_MOVEMENT)
 
 model = DQNAgent(env.action_space.n)
-model.load()
-memory = ReplayMemory(640)
+memory = ReplayMemory(1000)
 optimizer = optim.RMSprop(model.parameters())
 steps_done = 0
 episode_durations = []
@@ -71,15 +75,17 @@ def select_action(state):
     global steps_done
     if np.random.random() < exploration_rate(steps_done):
         with torch.no_grad():
-            return model(state).type(torch.FloatTensor).data.max(1)[1].view(1, 1)
+            return model(state) \
+                .type(torch.FloatTensor) \
+                .data.max(1)[1].view(1, 1)
     else:
         return env.action_space.sample()
 
 
 def learn():
-    if len(memory) < 32:
+    if len(memory) < 16:
         return
-    transitions = memory.sample(32)
+    transitions = memory.sample(16)
     batch_current_state, batch_action, batch_next_state, batch_reward = zip(*transitions)
 
     batch_current_state = torch.cat(batch_current_state)
@@ -98,54 +104,28 @@ def learn():
     optimizer.step()
 
 
-train = False
-if train:
-    for i_episode in range(100):
-        current_state = env.reset()
+for i_episode in range(10):
+    current_state = env.reset()
 
-        for t in range(200):
-            env.render()
-            action = select_action(torch.FloatTensor([current_state]))
-            next_state, reward, done, _ = env.step(action.item())
-
-            if done and t < 199:
-                reward = -1
-
-            memory.append((torch.FloatTensor([current_state]), action,
-                           torch.FloatTensor([next_state]), torch.FloatTensor([reward])))
-
-            learn()
-
-            current_state = next_state
-
-            if done:
-                print("Episode {epnum: <3} exited after {stepnum: <3} steps".format(
-                    epnum=i_episode,
-                    stepnum=t,
-                ))
-                break
-else:
-    for i_episode in range(10):
-        current_state = env.reset()
-        for t in range(200):
-            env.render()
-            action = select_action(torch.FloatTensor([current_state]))
-            next_state, reward, done, _ = env.step(action.item())
-
-            if done and t < 199:
-                reward = -1
-
-            memory.append((torch.FloatTensor([current_state]), action,
-                           torch.FloatTensor([next_state]), torch.FloatTensor([reward])))
-
-            current_state = next_state
-
-            if done:
-                print("Episode {epnum: <3} exited after {stepnum: <3} steps".format(
-                    epnum=i_episode,
-                    stepnum=t,
-                ))
-                break
+    for t in range(5000):
+        env.render()
+        action = select_action(torch.FloatTensor([current_state]))
+        next_state, reward, done, _ = env.step(action.item())
 
 
-# model.save()
+        if done:
+            reward = -1
+
+        memory.append((torch.FloatTensor([current_state]), action,
+                       torch.FloatTensor([next_state]), torch.FloatTensor([reward])))
+
+        learn()
+
+        current_state = next_state
+
+        if done:
+            print("Episode {epnum: <3} exited after {stepnum: <3} steps".format(
+                epnum=i_episode,
+                stepnum=t,
+            ))
+            break
