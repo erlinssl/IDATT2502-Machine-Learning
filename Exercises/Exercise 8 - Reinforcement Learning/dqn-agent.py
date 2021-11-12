@@ -50,6 +50,7 @@ class DQNAgent(nn.Module):
     def forward(self, x):
         x = F.relu(self.dense21(x))
         x = F.relu(self.dense22(x))
+        print("out", x)
         return x
 
     def learn(self):
@@ -64,9 +65,10 @@ class DQNAgent(nn.Module):
         batch_next_state = torch.cat(batch_next_state)
 
         # print(batch_current_state.shape)
-        # print(batch_action.shape)
+        print("debug", self(batch_current_state))
+        print("batchaction shape", batch_action)
         # print(model(batch_current_state).gather(1, batch_action).shape)
-        # time.sleep(5)
+        time.sleep(5)
         current_q_values = self(batch_current_state).gather(1, batch_action)
         max_next_q_values = self(batch_next_state).detach().max(1)[0]
         expected_q_values = batch_reward + (0.8 * max_next_q_values)  # 0.8 = discount rate
@@ -114,6 +116,8 @@ def select_action(state):
     if rand > expl:
         # print("woweofjwapjfewp")
         with torch.no_grad():
+            print(model(state).type(torch.FloatTensor).data.max(1)[1].view(1, 1))
+            # time.sleep(1)
             return model(state).type(torch.FloatTensor).data.max(1)[1].view(1, 1)
     else:
         expl_steps += 1

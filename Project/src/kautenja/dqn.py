@@ -35,16 +35,17 @@ class ReplayMemory:
 
 
 class DQNAgent(nn.Module):
-    def __init__(self, action_space, in_channels=9):
+    def __init__(self, action_space, in_channels=3):
         super(DQNAgent, self).__init__()
-        print(action_space)
-        self.dense = nn.Linear(in_channels, 256)
-        self.dense2 = nn.Linear(256, action_space)
+        print("action", action_space)
+        self.dense = nn.Linear(in_channels, 512)
+        self.dense2 = nn.Linear(512, action_space)
 
     def forward(self, x):
-        print(x.shape)
+        print("forward shape", x.shape)
         x = F.relu(self.dense(x))
         x = F.relu(self.dense2(x))
+        print(x)
         return x
 
     def save(self):
@@ -108,12 +109,11 @@ def learn():
 
 for i_episode in range(10):
     current_state = env.reset()
-
+    print("current", current_state)
     for t in range(5000):
         env.render()
         action = select_action(torch.FloatTensor([current_state]))
-        next_state, reward, done, _ = env.step(action.item())
-
+        next_state, reward, done, info = env.step(action.item())
 
         if done:
             reward = -1
