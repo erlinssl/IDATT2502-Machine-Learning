@@ -14,7 +14,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 
-TRAIN_PATH = os.path.join(os.path.dirname(__file__), 'trained_model.pt')
+TRAIN_PATH = os.path.join(os.path.dirname(__file__), 'kaut_model.pt')
 EPS_DECAY = 2.5
 
 
@@ -119,6 +119,7 @@ def learn():
 piece_dict = {'T': 0, 'J': 1, 'Z': 2, 'O': 3, 'S': 4, 'L': 5, 'I': 6}
 for i_episode in range(50):
     rewards = []
+    total_reward = 0
     current_state = env.reset()
     _, reward, done, info = env.step(0)
     next_state = torch.Tensor([[piece_dict[info['current_piece'][0:1]], info['number_of_lines'],
@@ -136,8 +137,8 @@ for i_episode in range(50):
         _, reward, done, info = env.step(action.item())
         next_state = torch.Tensor([[piece_dict[info['current_piece'][0:1]], info['number_of_lines'],
                                     info['score'], piece_dict[info['next_piece'][0:1]], info['board_height']]])
-        if done:
-            reward -= -10
+        # if done:
+        #     reward -= 10
 
         memory.append((current_state, torch.FloatTensor([[action]]),
                        next_state, torch.FloatTensor([reward])))
@@ -146,7 +147,8 @@ for i_episode in range(50):
 
         current_state = next_state
 
-        rewards.append(reward)
+        total_reward += reward
+        rewards.append(total_reward)
 
         if done:
             print("Episode {epnum: <3} exited after {stepnum: <3} steps".format(
@@ -158,3 +160,5 @@ for i_episode in range(50):
                        .format(epnum=i_episode))
             plot.show()
             break
+
+model.save()
