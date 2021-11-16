@@ -17,6 +17,8 @@ import torch.nn.functional as F
 TRAIN_PATH = os.path.join(os.path.dirname(__file__), 'kaut_model.pt')
 EPS_DECAY = 2.5
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 class ReplayMemory:
     def __init__(self, capacity):
@@ -61,11 +63,12 @@ class DQNAgent(nn.Module):
         model.eval()
 
 
-env = gym_tetris.make('TetrisA-v0')
+env = gym_tetris.make('TetrisA-v2')
 env = JoypadSpace(env, SIMPLE_MOVEMENT)
 
 model = DQNAgent(env.action_space.n)
-memory = ReplayMemory(64000)
+BATCH_SIZE = 512
+memory = ReplayMemory(BATCH_SIZE * 256)
 optimizer = optim.RMSprop(model.parameters())
 steps_done = 0
 episode_durations = []
@@ -92,9 +95,9 @@ def select_action(state):
 
 
 def learn():
-    if len(memory) < 512:
+    if len(memory) < BATCH_SIZE:
         return
-    transitions = memory.sample(512)
+    transitions = memory.sample(BATCH_SIZE)
     batch_current_state, batch_action, batch_next_state, batch_reward = zip(*transitions)
 
     batch_current_state = torch.cat(batch_current_state)
@@ -107,7 +110,7 @@ def learn():
 
     current_q_values = model(batch_current_state).gather(1, batch_action.type(torch.int64))
     max_next_q_values = model(batch_next_state).detach().max(1)[0]
-    expected_q_values = batch_reward + (0.8 * max_next_q_values)  # 0.8 = discount rate
+    expected_q_values = batch_reward + (0.95 * max_next_q_values)  # 0.8 = discount rate
 
     loss = F.smooth_l1_loss(current_q_values.squeeze(), expected_q_values.squeeze())
 
@@ -117,12 +120,21 @@ def learn():
 
 
 piece_dict = {'T': 0, 'J': 1, 'Z': 2, 'O': 3, 'S': 4, 'L': 5, 'I': 6}
+
+ext_pieces = {'Td': 0, 'Tr': 1, 'Tu': 2, 'Tl': 3,
+              'Jd': 4, 'Jr': 5, 'Ju': 6, 'Jl': 7,
+              'Zh': 8, 'Zv': 9,
+              'O': 10,
+              'Sh': 11, 'Sv': 12,
+              'Ld': 13, 'Lr': 14, 'Lu': 15, 'Ll': 16,
+              'Ih': 17, 'Iv': 18, None:19}
+episode_rewards = []
 for i_episode in range(50):
     rewards = []
     total_reward = 0
     current_state = env.reset()
     _, reward, done, info = env.step(0)
-    next_state = torch.Tensor([[piece_dict[info['current_piece'][0:1]], info['number_of_lines'],
+    next_state = torch.Tensor([[ext_pieces[info['current_piece']], info['number_of_lines'],
                                 info['score'], piece_dict[info['next_piece'][0:1]], info['board_height']]])
     current_state = next_state
     t = 0
@@ -135,10 +147,22 @@ for i_episode in range(50):
             action = torch.Tensor([action])
         # print("aaaaaaaaaaaaaaaaaction", action)
         _, reward, done, info = env.step(action.item())
-        next_state = torch.Tensor([[piece_dict[info['current_piece'][0:1]], info['number_of_lines'],
-                                    info['score'], piece_dict[info['next_piece'][0:1]], info['board_height']]])
-        # if done:
-        #     reward -= 10
+        if info['current_piece'] is None:
+            print(info)
+        if info['number_of_lines'] is None:
+            print(info)
+            print(info['number_of_lines'])
+        next_state = torch.Tensor([[ext_pieces[info['current_piece']], info['number_of_lines'],
+                                    info['score'], ext_pieces[info['next_piece']], info['board_height']]])
+
+        if done:
+            reward -= 10
+
+        # if reward == 0:  # Stay-alive bonus
+        #     reward += 1
+
+        if reward != 0:
+            print(reward)
 
         memory.append((current_state, torch.FloatTensor([[action]]),
                        next_state, torch.FloatTensor([reward])))
@@ -151,14 +175,19 @@ for i_episode in range(50):
         rewards.append(total_reward)
 
         if done:
-            print("Episode {epnum: <3} exited after {stepnum: <3} steps".format(
+            print("Episode {epnum: <3} exited after {stepnum: <3} steps with a total reward of {reward}".format(
+                reward=total_reward,
                 epnum=i_episode,
                 stepnum=t,
             ))
+            episode_rewards.append(total_reward)
             plot.plot(rewards)
             plot.title("Reward during episode {epnum}"
                        .format(epnum=i_episode))
             plot.show()
             break
 
+plot.plot(episode_rewards)
+plot.title("Total reward per episode")
+plot.show()
 model.save()
