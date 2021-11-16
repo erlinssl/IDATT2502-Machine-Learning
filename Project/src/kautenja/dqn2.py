@@ -1,5 +1,6 @@
 import time
 
+import matplotlib.pyplot as plot
 from nes_py.wrappers import JoypadSpace
 import os
 import gym_tetris
@@ -13,9 +14,9 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 
-
 TRAIN_PATH = os.path.join(os.path.dirname(__file__), 'trained_model.pt')
 EPS_DECAY = 2.5
+
 
 class ReplayMemory:
     def __init__(self, capacity):
@@ -72,7 +73,7 @@ episode_durations = []
 
 def exploration_rate(n: int, min_rate=0.01) -> float:
     global t
-    return max(min_rate, 1 / (EPS_DECAY ** n + t/250))
+    return max(min_rate, 1 / (EPS_DECAY ** n + t / 250))
 
 
 def select_action(state):
@@ -117,6 +118,7 @@ def learn():
 
 piece_dict = {'T': 0, 'J': 1, 'Z': 2, 'O': 3, 'S': 4, 'L': 5, 'I': 6}
 for i_episode in range(50):
+    rewards = []
     current_state = env.reset()
     _, reward, done, info = env.step(0)
     next_state = torch.Tensor([[piece_dict[info['current_piece'][0:1]], info['number_of_lines'],
@@ -133,7 +135,7 @@ for i_episode in range(50):
         # print("aaaaaaaaaaaaaaaaaction", action)
         _, reward, done, info = env.step(action.item())
         next_state = torch.Tensor([[piece_dict[info['current_piece'][0:1]], info['number_of_lines'],
-                               info['score'], piece_dict[info['next_piece'][0:1]], info['board_height']]])
+                                    info['score'], piece_dict[info['next_piece'][0:1]], info['board_height']]])
         if done:
             reward -= -10
 
@@ -144,9 +146,15 @@ for i_episode in range(50):
 
         current_state = next_state
 
+        rewards.append(reward)
+
         if done:
             print("Episode {epnum: <3} exited after {stepnum: <3} steps".format(
                 epnum=i_episode,
                 stepnum=t,
             ))
+            plot.plot(rewards)
+            plot.title("Reward during episode {epnum}"
+                       .format(epnum=i_episode))
+            plot.show()
             break
