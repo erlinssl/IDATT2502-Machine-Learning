@@ -80,20 +80,20 @@ def select_action(state):
     if np.random.random() > exploration_rate(steps_done):
         with torch.no_grad():
             amp = model(state).type(torch.FloatTensor).data.max(1).indices
-            print("grrr", amp)
-            print(type(amp))
+            # print("grrr", amp)
+            # print(type(amp))
             return amp
     else:
         amp = torch.IntTensor([env.action_space.sample()])
-        print("exploing", amp)
-        print(type(amp))
+        # print("exploing", amp)
+        # print(type(amp))
         return amp
 
 
 def learn():
-    if len(memory) < 128:
+    if len(memory) < 512:
         return
-    transitions = memory.sample(128)
+    transitions = memory.sample(512)
     batch_current_state, batch_action, batch_next_state, batch_reward = zip(*transitions)
 
     batch_current_state = torch.cat(batch_current_state)
@@ -116,7 +116,7 @@ def learn():
 
 
 piece_dict = {'T': 0, 'J': 1, 'Z': 2, 'O': 3, 'S': 4, 'L': 5, 'I': 6}
-for i_episode in range(10):
+for i_episode in range(50):
     current_state = env.reset()
     _, reward, done, info = env.step(0)
     next_state = torch.Tensor([[piece_dict[info['current_piece'][0:1]], info['number_of_lines'],
@@ -130,12 +130,10 @@ for i_episode in range(10):
         action = select_action(next_state)
         if isinstance(action, int):
             action = torch.Tensor([action])
-        print("aaaaaaaaaaaaaaaaaction", action)
+        # print("aaaaaaaaaaaaaaaaaction", action)
         _, reward, done, info = env.step(action.item())
         next_state = torch.Tensor([[piece_dict[info['current_piece'][0:1]], info['number_of_lines'],
                                info['score'], piece_dict[info['next_piece'][0:1]], info['board_height']]])
-        print("rwewaerwarewrawerfweafewajfioweariojwerioweariojweioajwerioj", reward)
-        reward -= info['board_height']
         if done:
             reward -= -10
 
