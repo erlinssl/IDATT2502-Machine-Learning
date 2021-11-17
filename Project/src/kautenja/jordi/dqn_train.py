@@ -13,7 +13,7 @@ import random
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-TRAIN_PATH = os.path.join(os.path.dirname(__file__), 'trained/v1_current_best.pt')
+TRAIN_PATH = os.path.join(os.path.dirname(__file__), 'trained/v3_0_current_best.pt')
 
 GAMMA = 0.9
 BATCH_SIZE = 2 ** 4
@@ -87,7 +87,7 @@ def get_loss(batch, net, tgt_net, device=device):
 
 
 if __name__ == "__main__":
-    env = gym_tetris.make('TetrisA-v3')
+    env = gym_tetris.make('TetrisA-v2')
     env = JoypadSpace(env, SIMPLE_MOVEMENT)
     env = wrap.wrap_env(env)
 

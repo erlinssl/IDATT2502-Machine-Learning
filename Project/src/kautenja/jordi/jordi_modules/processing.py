@@ -8,12 +8,13 @@ import numpy as np
 
 class ProcessFrame84(gym.ObservationWrapper):
     '''
-    Preprocessing to downscale a gym obersvation from it's RGB original resolution to
-    a grayscaled 84x84 image, which will be a lot easier to pass through the NN.
+    Preprocessing to downscale a gym obersvation from it's original resolution RGB image to
+    a grayscaled 20x20 image, which will be a lot easier to pass through the NN.
+    Also crops out uncessessary noise, like the sidebars in our environment.
     '''
     def __init__(self, env=None):
         super(ProcessFrame84, self).__init__(env)
-        self.observation_space = gym.spaces.Box(low=0, high=255, shape=(84, 84, 1), dtype=np.uint8)
+        self.observation_space = gym.spaces.Box(low=0, high=255, shape=(20, 20, 1), dtype=np.uint8)
 
     def observation(self, obs):
         return ProcessFrame84.process(obs)
@@ -36,12 +37,14 @@ class ProcessFrame84(gym.ObservationWrapper):
         # cv2.cv2.imshow("before_resize", img)  # For debugging image crop
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
-        resized_screen = cv2.resize(img, (84, 110), interpolation=cv2.INTER_AREA)
+        resized_screen = cv2.resize(img, (20, 20), interpolation=cv2.INTER_AREA)
         # cv2.imshow("after_resize", resized_screen)  # For debugging image rescaling
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
-        x_t = resized_screen[18:102, :]
-        x_t = np.reshape(x_t, [84, 84, 1])
+        x_t = np.reshape(resized_screen, [20, 20, 1])
+        # cv2.imshow("after_reshape", x_t)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
         return x_t.astype(np.uint8)
 
 
