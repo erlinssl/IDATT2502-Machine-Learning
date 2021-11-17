@@ -40,17 +40,17 @@ class DQNAgent(nn.Module):
     def __init__(self, action_space, in_channels=4):
         super(DQNAgent, self).__init__()
         self.memory = ReplayMemory(CAPACITY)
-        self.dense = nn.Linear(in_channels, 64)
-        self.dense2 = nn.Linear(64, 256)
-        self.dense3 = nn.Linear(256, 64)
-        self.dense4 = nn.Linear(64, action_space)
+        # self.dense = nn.Linear(in_channels, 64)
+        # self.dense2 = nn.Linear(64, 256)
+        # self.dense3 = nn.Linear(256, 64)
+        # self.dense4 = nn.Linear(64, action_space)
         self.dense21 = nn.Linear(in_channels, 256)
         self.dense22 = nn.Linear(256, action_space)
 
     def forward(self, x):
         x = F.relu(self.dense21(x))
         x = F.relu(self.dense22(x))
-        print("out", x)
+        # print("out", x)
         return x
 
     def learn(self):
@@ -65,10 +65,10 @@ class DQNAgent(nn.Module):
         batch_next_state = torch.cat(batch_next_state)
 
         # print(batch_current_state.shape)
-        print("debug", self(batch_current_state))
-        print("batchaction shape", batch_action)
+        # print("debug", self(batch_current_state))
+        # print("batchaction shape", batch_action)
         # print(model(batch_current_state).gather(1, batch_action).shape)
-        time.sleep(5)
+        # time.sleep(5)
         current_q_values = self(batch_current_state).gather(1, batch_action)
         max_next_q_values = self(batch_next_state).detach().max(1)[0]
         expected_q_values = batch_reward + (0.8 * max_next_q_values)  # 0.8 = discount rate
@@ -106,19 +106,19 @@ def exploration_rate(n: int, min_rate=0.01) -> float:
     # max(min_rate, min(1, 1.0 + np.log10(n + 1 / 25)))
 
 
-def select_action(state):
+def select_action(state, training: bool):
     global steps_done
     global expl_steps
     rand = round(np.random.random(), 1)
     expl = float(exploration_rate(steps_done))
     # print(steps_done, ": ", rand, "<", expl)
     # time.sleep(0.5)
-    if rand > expl:
+    if rand > expl or not training:
         # print("woweofjwapjfewp")
-        with torch.no_grad():
-            print(model(state).type(torch.FloatTensor).data.max(1)[1].view(1, 1))
+        # with torch.no_grad():
+            # print(model(state).type(torch.FloatTensor).data.max(1)[1].view(1, 1))
             # time.sleep(1)
-            return model(state).type(torch.FloatTensor).data.max(1)[1].view(1, 1)
+        return model(state).type(torch.FloatTensor).data.max(1)[1].view(1, 1)
     else:
         expl_steps += 1
         # print("eplox:", rand, "<", expl, (rand < expl))
@@ -128,12 +128,12 @@ def select_action(state):
 train = True
 if train:
     print("Training!")
-    for i_episode in range(250):
+    for i_episode in range(75):
         current_state = env.reset()
         expl_steps = 0
         for t in range(200):
             # env.render()
-            action = select_action(torch.FloatTensor([current_state]))
+            action = select_action(torch.FloatTensor([current_state]), train)
             # time.sleep(1)
             if isinstance(action, int):
                 # print("isint")
@@ -164,18 +164,18 @@ if train:
                 ))
                 break
     model.save()
-    torch.save(optimizer.state_dict(), OPTIM_PATH)
+    # torch.save(optimizer.state_dict(), OPTIM_PATH)
 else:
     print("Testing!")
     model.load()
     model.eval()
-    optimizer.load_state_dict(torch.load(OPTIM_PATH))
-    for i_episode in range(10):
+    # optimizer.load_state_dict(torch.load(OPTIM_PATH))
+    for i_episode in range(100):
         current_state = env.reset()
         for t in range(200):
             env.render()
-            action = select_action(torch.FloatTensor([current_state]))
-            next_state, reward, done, _ = env.step(action)
+            action = select_action(torch.FloatTensor([current_state]), train)
+            next_state, reward, done, _ = env.step(action.item())
 
             if done and t < 199:
                 reward = -1
@@ -184,15 +184,50 @@ else:
                            torch.FloatTensor([next_state]), torch.FloatTensor([reward])))
 
             if done:
-                print("Episode {epnum: <3} exited after {stepnum: <3} steps".format(
+                print("Episode {epnum: <3} exited after {stepnum: <3} steps, {expl: <3} explorational".format(
                     epnum=i_episode,
                     stepnum=t,
+                    expl=expl_steps,
                 ))
                 break
 
-# print("Model's state_dict:")
-# for params in model.state_dict():
-#     print(params, '\t', model.state_dict()[params].size())
+
+print("Model's state_dict:")
+for params in model.state_dict():
+    print(params, '\t', model.state_dict()[params])
+
+print("Testing!")
+train = False
+model = DQNAgent(env.action_space.n)
+model.load_state_dict(torch.load(TRAIN_PATH))
+model.eval()
+
+print("Loaded state_dict:")
+for params in model.state_dict():
+    print(params, '\t', model.state_dict()[params])
+
+# optimizer.load_state_dict(torch.load(OPTIM_PATH))
+for i_episode in range(50):
+    current_state = env.reset()
+    expl_steps = 0
+    for t in range(200):
+        env.render()
+        action = select_action(torch.FloatTensor([current_state]), train)
+        next_state, reward, done, _ = env.step(action.item())
+
+        if done and t < 199:
+            reward = -1
+
+        model.memory.append((torch.FloatTensor([current_state]), action,
+                       torch.FloatTensor([next_state]), torch.FloatTensor([reward])))
+
+        if done:
+            print("Episode {epnum: <3} exited after {stepnum: <3} steps, {expl: <3} explorational".format(
+                epnum=i_episode,
+                stepnum=t,
+                expl=expl_steps,
+            ))
+            break
 
 # print("Optimizer's state_dict:")
 # for var_name in optimizer.state_dict():
