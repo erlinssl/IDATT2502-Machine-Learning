@@ -1,9 +1,38 @@
-import cv2.cv2
 import gym
 import cv2
-import torch
-import torch.nn as nn
 import numpy as np
+from collections import deque
+import random
+
+
+class MaxAndSkipEnv(gym.Wrapper):
+    '''
+    Used to repeat a given action n times, given by the skip parameter. This is done since
+    the environment takes a few frames to update anyways, so we can offload some extra work.
+    The states of each "skipped" frame that is max pooled then passed on.
+    '''
+    def __init__(self, env=None, skip=3):
+        super(MaxAndSkipEnv, self).__init__(env)
+        self._state_buffer = deque(maxlen=2)
+        self._skip = skip
+
+    def step(self, action):
+        total_reward = 0.0
+        done = None
+        for _ in range(self._skip):
+            next_state, reward, done, info = self.env.step(action)
+            self._state_buffer.append(next_state)
+            total_reward += reward
+            if done:
+                break
+        max_frame = np.max(np.stack(self._state_buffer), axis=0)
+        return max_frame, total_reward, done, info
+
+    def reset(self):
+        self._state_buffer.clear()
+        state = self.env.reset()
+        self._state_buffer.append(state)
+        return state
 
 
 class ProcessFrame84(gym.ObservationWrapper):
@@ -32,8 +61,8 @@ class ProcessFrame84(gym.ObservationWrapper):
         else:
             assert False, "Unknown resolution."
 
-        # 95 + 81 / 47 + 162
-        img = img[47:209, 95:176, 0] * 0.299 + img[47:209, 95:176, 1] * 0.587 + img[47:209, 95:176, 2] * 0.114
+        # 95 + 80 / 47 + 160
+        img = img[47:208, 95:174, 0] * 0.299 + img[47:208, 95:174, 1] * 0.587 + img[47:208, 95:174, 2] * 0.114
         # cv2.cv2.imshow("before_resize", img)  # For debugging image crop
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
@@ -45,7 +74,12 @@ class ProcessFrame84(gym.ObservationWrapper):
         # cv2.imshow("after_reshape", x_t)
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
-        return x_t.astype(np.uint8)
+        x_t = x_t.astype(np.uint8)
+        # if random.random() < 0.05:
+        #     cv2.imshow("random", x_t)
+        #     cv2.waitKey(0)
+        #     cv2.destroyAllWindows()
+        return x_t
 
 
 class BufferWrapper(gym.ObservationWrapper):
@@ -99,6 +133,7 @@ class ScaledFloatFrame(gym.ObservationWrapper):
 
 
 def wrap_env(env):
+    env = MaxAndSkipEnv(env)
     env = ProcessFrame84(env)
     env = ImageToPyTorch(env)
     env = BufferWrapper(env, 4)
