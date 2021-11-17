@@ -63,7 +63,7 @@ class DQNAgent(nn.Module):
         model.eval()
 
 
-env = gym_tetris.make('TetrisA-v2')
+env = gym_tetris.make('TetrisA-v3')
 env = JoypadSpace(env, SIMPLE_MOVEMENT)
 
 model = DQNAgent(env.action_space.n)
@@ -127,7 +127,8 @@ ext_pieces = {'Td': 0, 'Tr': 1, 'Tu': 2, 'Tl': 3,
               'O': 10,
               'Sh': 11, 'Sv': 12,
               'Ld': 13, 'Lr': 14, 'Lu': 15, 'Ll': 16,
-              'Ih': 17, 'Iv': 18, None:19}
+              'Ih': 17, 'Iv': 18, None: 19}
+
 episode_rewards = []
 for i_episode in range(50):
     rewards = []
@@ -141,7 +142,7 @@ for i_episode in range(50):
     while not done:
         t += 1
         # print("info", next_state)
-        env.render()
+        # env.render()
         action = select_action(next_state)
         if isinstance(action, int):
             action = torch.Tensor([action])
@@ -161,8 +162,10 @@ for i_episode in range(50):
         # if reward == 0:  # Stay-alive bonus
         #     reward += 1
 
-        if reward != 0:
-            print(reward)
+        if reward > 0:
+            print('Gained a reward of {rew: <2} on step {step: <5}, episode {ep}'.format(rew=reward,
+                                                                                  step=t,
+                                                                                  ep=i_episode))
 
         memory.append((current_state, torch.FloatTensor([[action]]),
                        next_state, torch.FloatTensor([reward])))
@@ -175,7 +178,7 @@ for i_episode in range(50):
         rewards.append(total_reward)
 
         if done:
-            print("Episode {epnum: <3} exited after {stepnum: <3} steps with a total reward of {reward}".format(
+            print("Episode {epnum: <3} exited after {stepnum: <5} steps with a total reward of {reward}".format(
                 reward=total_reward,
                 epnum=i_episode,
                 stepnum=t,
