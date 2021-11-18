@@ -4,6 +4,8 @@ import numpy as np
 from collections import deque
 import random
 
+HEIGHT = 30
+WIDTH = 30
 
 class MaxAndSkipEnv(gym.Wrapper):
     '''
@@ -11,7 +13,7 @@ class MaxAndSkipEnv(gym.Wrapper):
     the environment takes a few frames to update anyways, so we can offload some extra work.
     The states of each "skipped" frame that is max pooled then passed on.
     '''
-    def __init__(self, env=None, skip=3):
+    def __init__(self, env=None, skip=2):
         super(MaxAndSkipEnv, self).__init__(env)
         self._state_buffer = deque(maxlen=2)
         self._skip = skip
@@ -43,7 +45,7 @@ class ProcessFrame84(gym.ObservationWrapper):
     '''
     def __init__(self, env=None):
         super(ProcessFrame84, self).__init__(env)
-        self.observation_space = gym.spaces.Box(low=0, high=255, shape=(20, 20, 1), dtype=np.uint8)
+        self.observation_space = gym.spaces.Box(low=0, high=255, shape=(WIDTH, HEIGHT, 1), dtype=np.uint8)
 
     def observation(self, obs):
         return ProcessFrame84.process(obs)
@@ -66,11 +68,11 @@ class ProcessFrame84(gym.ObservationWrapper):
         # cv2.cv2.imshow("before_resize", img)  # For debugging image crop
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
-        resized_screen = cv2.resize(img, (20, 20), interpolation=cv2.INTER_AREA)
+        resized_screen = cv2.resize(img, (WIDTH, HEIGHT), interpolation=cv2.INTER_AREA)
         # cv2.imshow("after_resize", resized_screen)  # For debugging image rescaling
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
-        x_t = np.reshape(resized_screen, [20, 20, 1])
+        x_t = np.reshape(resized_screen, [WIDTH, HEIGHT, 1])
         # cv2.imshow("after_reshape", x_t)
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()

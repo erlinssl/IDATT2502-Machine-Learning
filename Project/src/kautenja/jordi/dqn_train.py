@@ -22,7 +22,7 @@ REPLAY_SIZE = 2 ** 16
 LEARN_RATE = 1e-4
 SYNC_FRAMES = 1000  # Target network will be synced with main network every n-th frame
 REPLAY_START = 2 ** 16
-TARGET_REWARD = 100
+TARGET_REWARD = 9
 
 EPS_START = 1.0
 EPS_DECAY = 0.999985
@@ -53,16 +53,16 @@ class Agent:
                 action = int(act_v.item())
 
             new_state, reward, done, info = self.env.step(action)
-            self.total_reward += reward
+            self.total_reward += reward * 10  # TODO Stay alive bonus?
 
-            transition = (np.array(self.state), np.array(action),
-                          np.array(reward), np.array(done), np.array(new_state))  # DIFF
+            transition = (self.state, action,
+                          reward, done, new_state)  # DIFF
             self.mem_buffer.append(transition)
 
-            self.state = new_state  # was missing, oops
+            self.state = new_state
 
             if done:
-                done_reward = self.total_reward # - 10
+                done_reward = self.total_reward - 1
                 self._reset()
 
             return done_reward
@@ -77,7 +77,7 @@ def get_loss(batch, net, tgt_net, device=device):
     rewards_v = torch.tensor(rewards).to(device)
     done_mask = torch.BoolTensor(dones).to(device)
 
-    state_action_values = net(states_v).gather(1, actions_v.unsqueece(-1)).squeeze(-1)
+    state_action_values = net(states_v).gather(1, actions_v.unsqueeze(-1)).squeeze(-1)
 
     with torch.no_grad():
         next_state_values = tgt_net(next_states_v).max(1)[0]
@@ -86,8 +86,7 @@ def get_loss(batch, net, tgt_net, device=device):
 
     expected_state_action_values = next_state_values * GAMMA + rewards_v
 
-    return nn.MSELoss()(state_action_values,
-                        expected_state_action_values)
+    return nn.MSELoss()(state_action_values, expected_state_action_values)
 
 
 if __name__ == "__main__":
@@ -107,24 +106,30 @@ if __name__ == "__main__":
     optimizer = optim.Adam(net.parameters(), lr=LEARN_RATE)
     total_rewards = []
     step = 0
+    last_steps = 0
     best_mean_reward = None
 
     while True:
         step += 1
         epsilon = max(epsilon * EPS_DECAY, EPS_MIN)
-        # env.render()
+
+        if len(total_rewards) % 10 == 0:
+            env.render()
 
         reward = agent.play_step(net, epsilon, device=device)
         if reward is not None:
             total_rewards.append(reward)
             mean_reward = np.mean(total_rewards[-100:])
-            print("{step: <10}: episode {episodes: <3} ended with {reward: <5}, "
-                  "mean reward {mean: <10}, (epsilon {eps})"
+            print("episode {episodes: <3} : {epstep: <5} / {step: <10}, ended with {reward: <5}, "
+                  "mean reward {mean: <8}, (epsilon {eps: <20})"
                   .format(step=step,
                           episodes=len(total_rewards),
                           reward=reward,
                           mean=np.round(mean_reward, 2),
-                          eps=epsilon))
+                          eps=epsilon,
+                          epstep=step-last_steps))
+
+            last_steps = step
 
             if best_mean_reward is None or best_mean_reward < mean_reward:
                 if not os.path.exists(os.path.dirname(TRAIN_PATH)):
@@ -143,14 +148,14 @@ if __name__ == "__main__":
                     os.makedirs(os.path.dirname(TENTH_PATH))
                 torch.save(net.state_dict(), TENTH_PATH)
 
+            optimizer.zero_grad()
+            batch = memory.sample(BATCH_SIZE)
+            loss_t = get_loss(batch, net, target_net, device=device)
+            loss_t.backward()
+            optimizer.step()
+
         if len(memory) < REPLAY_START:
             continue
 
         if step % SYNC_FRAMES == 0:
             target_net.load_state_dict(net.state_dict())
-
-        optimizer.zero_grad()
-        batch = memory.sample(BATCH_SIZE)
-        loss_t = get_loss(batch, net, target_net, device=device)
-        loss_t.backward()
-        optimizer.step()
