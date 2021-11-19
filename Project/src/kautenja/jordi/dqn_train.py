@@ -119,6 +119,18 @@ if __name__ == "__main__":
     loss_t = None
     save_optim = False
 
+    load_point = False
+    LOAD_PATH = os.path.join(os.path.dirname(__file__), 'trained/30x30/A1_v4_3_again/ep20_oneline_optim.pt'.format(VERSION))
+    if load_point:
+        checkpoint = torch.load(LOAD_PATH)
+        print(checkpoint)
+        net.load_state_dict(checkpoint['model_state_dict'])
+        target_net.load_state_dict(checkpoint['model_state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer_state-dict'])  # ...state_dict
+        step = checkpoint['epoch']  # 'step'
+        loss_t = checkpoint['loss']
+        print("Checkpoint loaded")
+
     while True:
         step += 1
         epsilon = max(epsilon * EPS_DECAY, EPS_MIN)
