@@ -1,5 +1,3 @@
-import time
-
 import gym
 import cv2
 import numpy as np
@@ -13,7 +11,7 @@ class MaxAndSkipEnv(gym.Wrapper):
     the environment takes a few frames to update anyways, so we can offload some extra work.
     The states of each "skipped" frame that is max pooled then passed on.
     '''
-    def __init__(self, env=None, skip=2):
+    def __init__(self, env=None, skip=4):
         super(MaxAndSkipEnv, self).__init__(env)
         self._state_buffer = deque(maxlen=2)
         self._skip = skip
@@ -81,7 +79,8 @@ class ProcessFrameXY(gym.ObservationWrapper):
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
         x_t = x_t.astype(np.uint8)
-        # if random.random() < 1:
+        # if test > 1500:
+        #     print("scale show")
         #     cv2.imshow("random", x_t)
         #     cv2.waitKey(0)
         #     cv2.destroyAllWindows()
@@ -145,5 +144,5 @@ def wrap_env(env):
     env = MaxAndSkipEnv(env)
     env = ProcessFrameXY(env)
     env = ImageToPyTorch(env)
-    env = BufferWrapper(env, 4)
+    env = BufferWrapper(env, 2)
     return ScaledFloatFrame(env)

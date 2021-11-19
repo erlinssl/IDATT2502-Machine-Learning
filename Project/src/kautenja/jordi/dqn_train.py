@@ -13,7 +13,7 @@ from jordi_modules.memory import ReplayMemory
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-VERSION = "A1_v4_3"
+VERSION = "A1_v5_3"
 TRAIN_PATH = os.path.join(os.path.dirname(__file__), 'trained/{}_current_best.pt'.format(VERSION))
 TENTH_PATH = os.path.join(os.path.dirname(__file__), 'trained/{}_every_tenth.pt'.format(VERSION))
 
@@ -29,7 +29,7 @@ REPLAY_START = 2 ** 16
 TARGET_REWARD = 500000
 
 EPS_START = 1.0
-EPS_DECAY = 0.99999985
+EPS_DECAY = 0.999985
 EPS_MIN = 0.05
 
 
@@ -60,8 +60,8 @@ class Agent:
 
             new_state, reward, done, info = self.env.step(action)
             self.steps_alive += 1
-            self.alive_reward += self.steps_alive/15
-            self.total_reward += reward * 100 + (self.steps_alive/15)  # TODO reward for good builds?
+            self.alive_reward += self.steps_alive/25
+            self.total_reward += reward * 1000 + (self.steps_alive/25)  # TODO reward for good builds?
 
             transition = (self.state, action,
                           reward, done, new_state)
@@ -118,10 +118,10 @@ if __name__ == "__main__":
     best_mean_reward = None
 
     loss_t = None
-    save_optim = False
+    save_optim = True
 
     LOAD_PATH = os.path.join(os.path.dirname(__file__), 'trained/30x30/A1_v4_3_again/ep20_oneline_optim.pt'.format(VERSION))
-    if LOAD_PATH and 0:
+    if save_optim and 0:  # 'and 1' if resuming training from checkpoint
         checkpoint = torch.load(LOAD_PATH)
         print(checkpoint)
         net.load_state_dict(checkpoint['model_state_dict'])
@@ -194,10 +194,17 @@ if __name__ == "__main__":
                     torch.save(net.state_dict(), TENTH_PATH)
                     print("Tenth saved")
 
-                plt.title("Total rewards over {} episode(s)".format(len(total_rewards)))
-                plt.plot(total_rewards)
+                plt.title("Total rewards over {} episodes".format(len(total_rewards)))
+                plt.plot(np.linspace(0, len(total_rewards)), total_rewards)
                 plt.xlabel("Episode")
                 plt.ylabel("Reward")
+
+                plt_info = "\n".join((r'$\gamma=%.2f$' % GAMMA,
+                                      r'$\varepsilon_start=%.1f$' % EPS_START,
+                                      r'$\varepsilon_decay=%.8f$' % EPS_DECAY,
+                                      r'$\varepsilon_min  =%.2f$' % EPS_MIN))
+                plt.text(0.05, 0.95, plt_info)
+
                 plt.show()
 
             optimizer.zero_grad()
