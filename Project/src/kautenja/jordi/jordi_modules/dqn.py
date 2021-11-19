@@ -1,3 +1,5 @@
+import time
+
 import torch
 import torch.nn as nn
 import numpy as np
@@ -7,11 +9,11 @@ class DQN(nn.Module):
     def __init__(self, input_shape, n_actions):
         super(DQN, self).__init__()
         self.conv = nn.Sequential(
-            nn.Conv2d(4, 32, kernel_size=4),
+            nn.Conv2d(4, 32, kernel_size=3),
             nn.ReLU(),
-            nn.Conv2d(32, 64, kernel_size=4),
+            nn.Conv2d(32, 64, kernel_size=3),
             nn.ReLU(),
-            nn.Conv2d(64, 64, kernel_size=4),
+            nn.Conv2d(64, 64, kernel_size=3),
             nn.ReLU()
         )
 
@@ -30,5 +32,7 @@ class DQN(nn.Module):
         return int(np.prod(o.size()))
 
     def forward(self, x):
+        print(torch.round(10*x)/10)
+        time.sleep(15)
         conv_out = self.conv(x).view(x.size()[0], -1)
         return self.fc(conv_out).double()

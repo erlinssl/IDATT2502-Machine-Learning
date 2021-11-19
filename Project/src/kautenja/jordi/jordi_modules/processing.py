@@ -1,3 +1,5 @@
+import time
+
 import gym
 import cv2
 import numpy as np
@@ -35,39 +37,38 @@ class MaxAndSkipEnv(gym.Wrapper):
         return state
 
 
-HEIGHT = 30
-WIDTH = HEIGHT
-# WIDTH = 20
+HEIGHT = 20
+WIDTH = 10
 
 
-class ProcessFrame20(gym.ObservationWrapper):
+class ProcessFrameXY(gym.ObservationWrapper):
     '''
     Preprocessing to downscale a gym obersvation from it's original resolution RGB image to
-    a grayscaled 20x20 image, which will be a lot easier to pass through the NN.
-    Also crops out uncessessary noise, like the sidebars in our environment.
+    a grayscaled 20x10 image, which will be a lot easier to pass through the NN.
+    Also crops out uncessessary noise, like the sidebars in our chosen environment.
     '''
     def __init__(self, env=None):
-        super(ProcessFrame20, self).__init__(env)
-        self.observation_space = gym.spaces.Box(low=0, high=255, shape=(WIDTH, HEIGHT, 1), dtype=np.uint8)
+        super(ProcessFrameXY, self).__init__(env)
+        self.observation_space = gym.spaces.Box(low=0, high=255, shape=(HEIGHT, WIDTH, 1), dtype=np.uint8)
 
     def observation(self, obs):
-        return ProcessFrame20.process(obs)
+        return ProcessFrameXY.process(obs)
 
     @staticmethod
     def process(frame):
         if frame.size == 210 * 160 * 3:
             img = np.reshape(frame, [210, 160, 3]) \
-                .astype(np.float32)
+                .astype(np.float32)  # general gym.Atari resolution
 
         elif frame.size == 240 * 256 * 3:
             img = np.reshape(frame, [240, 256, 3]) \
-                .astype(np.float32)
+                .astype(np.float32)  # our tetris env resolution
 
         else:
             assert False, "Unknown resolution."
 
-        # 95 + 80 / 47 + 160
-        img = img[47:208, 95:174, 0] * 0.299 + img[47:208, 95:174, 1] * 0.587 + img[47:208, 95:174, 2] * 0.114
+        # 95 + 81 / 47 + 161
+        img = img[47:208, 95:176, 0] * 0.299 + img[47:208, 95:176, 1] * 0.587 + img[47:208, 95:176, 2] * 0.114
         # cv2.imshow("before_resize", img)  # For debugging image crop
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
@@ -75,12 +76,12 @@ class ProcessFrame20(gym.ObservationWrapper):
         # cv2.imshow("after_resize", resized_screen)  # For debugging image rescaling
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
-        x_t = np.reshape(resized_screen, [WIDTH, HEIGHT, 1])
+        x_t = np.reshape(resized_screen, [HEIGHT, WIDTH, 1])
         # cv2.imshow("after_reshape", x_t)
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
         x_t = x_t.astype(np.uint8)
-        # if random.random() < 0.05:
+        # if random.random() < 1:
         #     cv2.imshow("random", x_t)
         #     cv2.waitKey(0)
         #     cv2.destroyAllWindows()
@@ -129,17 +130,20 @@ class ImageToPyTorch(gym.ObservationWrapper):
 
 class ScaledFloatFrame(gym.ObservationWrapper):
     '''
-    Converts tensors with values between 0 and 255 to ones with
-    floats in the range [0.0, ..., 1.0], since this is a better
-    representation for an NN.
+    Converts tensors with values between 0 and 255 to either
+    0.0 or 1.0, since this is a better representation for the NN.
+    Divisor 125 is somewhat arbitray and may differ depending on
+    the environment. For the one I'm using, this ensures all tetromino
+    gradients are properly rounded to 1.
     '''
     def observation(self, obs):
-        return np.array(obs).astype(np.float32) / 255.0
+        obs = np.array(obs).astype(np.float32) / 125
+        return np.round(obs)
 
 
 def wrap_env(env):
     env = MaxAndSkipEnv(env)
-    env = ProcessFrame20(env)
+    env = ProcessFrameXY(env)
     env = ImageToPyTorch(env)
     env = BufferWrapper(env, 4)
     return ScaledFloatFrame(env)

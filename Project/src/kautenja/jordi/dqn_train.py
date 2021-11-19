@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import os
 import numpy as np
+import matplotlib.pyplot as plt
 import gym_tetris
 from nes_py.wrappers import JoypadSpace
 from gym_tetris.actions import SIMPLE_MOVEMENT
@@ -60,10 +61,10 @@ class Agent:
             new_state, reward, done, info = self.env.step(action)
             self.steps_alive += 1
             self.alive_reward += self.steps_alive/15
-            self.total_reward += reward * 1000 + (self.steps_alive/15)  # TODO reward for good builds?
+            self.total_reward += reward * 100 + (self.steps_alive/15)  # TODO reward for good builds?
 
             transition = (self.state, action,
-                          reward, done, new_state)  # DIFF
+                          reward, done, new_state)
             self.mem_buffer.append(transition)
 
             self.state = new_state
@@ -119,9 +120,8 @@ if __name__ == "__main__":
     loss_t = None
     save_optim = False
 
-    load_point = False
     LOAD_PATH = os.path.join(os.path.dirname(__file__), 'trained/30x30/A1_v4_3_again/ep20_oneline_optim.pt'.format(VERSION))
-    if load_point:
+    if LOAD_PATH and 0:
         checkpoint = torch.load(LOAD_PATH)
         print(checkpoint)
         net.load_state_dict(checkpoint['model_state_dict'])
@@ -193,6 +193,12 @@ if __name__ == "__main__":
                         os.makedirs(os.path.dirname(TENTH_PATH))
                     torch.save(net.state_dict(), TENTH_PATH)
                     print("Tenth saved")
+
+                plt.title("Total rewards over {} episode(s)".format(len(total_rewards)))
+                plt.plot(total_rewards)
+                plt.xlabel("Episode")
+                plt.ylabel("Reward")
+                plt.show()
 
             optimizer.zero_grad()
             batch = memory.sample(BATCH_SIZE)
