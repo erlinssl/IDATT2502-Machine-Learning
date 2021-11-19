@@ -12,21 +12,24 @@ from jordi_modules.memory import ReplayMemory
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-VERSION = "A1_v4_2_"
-TRAIN_PATH = os.path.join(os.path.dirname(__file__), 'trained/{}current_best.pt'.format(VERSION))
-TENTH_PATH = os.path.join(os.path.dirname(__file__), 'trained/{}every_tenth.pt'.format(VERSION))
+VERSION = "A1_v4_3"
+TRAIN_PATH = os.path.join(os.path.dirname(__file__), 'trained/{}_current_best.pt'.format(VERSION))
+TENTH_PATH = os.path.join(os.path.dirname(__file__), 'trained/{}_every_tenth.pt'.format(VERSION))
+
+TRAIN_OPTIM = os.path.join(os.path.dirname(__file__), 'trained/{}_current_best_optim.pt'.format(VERSION))
+TENTH_OPTIM = os.path.join(os.path.dirname(__file__), 'trained/{}_every_tenth_optim.pt'.format(VERSION))
 
 GAMMA = 0.9
 BATCH_SIZE = 2 ** 6
 REPLAY_SIZE = 2 ** 16
 LEARN_RATE = 1e-4
-SYNC_FRAMES = 1000  # Target network will be synced with main network every n-th frame
+SYNC_NTH = 1000  # Target network will be synced with main network every n-th step
 REPLAY_START = 2 ** 16
-TARGET_REWARD = 9
+TARGET_REWARD = 500000
 
 EPS_START = 1.0
-EPS_DECAY = 0.999985
-EPS_MIN = 0.02
+EPS_DECAY = 0.99999985
+EPS_MIN = 0.05
 
 
 class Agent:
@@ -38,6 +41,8 @@ class Agent:
     def _reset(self):
         self.state = env.reset()
         self.total_reward = 0.0
+        self.steps_alive = 0
+        self.alive_reward = 0
 
     def play_step(self, net, epsilon=0.0, device="cpu"):
         with torch.no_grad():
@@ -53,7 +58,9 @@ class Agent:
                 action = int(act_v.item())
 
             new_state, reward, done, info = self.env.step(action)
-            self.total_reward += reward * 10  # TODO Stay alive bonus?
+            self.steps_alive += 1
+            self.alive_reward += self.steps_alive/15
+            self.total_reward += reward * 1000 + (self.steps_alive/15)  # TODO reward for good builds?
 
             transition = (self.state, action,
                           reward, done, new_state)  # DIFF
@@ -62,7 +69,7 @@ class Agent:
             self.state = new_state
 
             if done:
-                done_reward = self.total_reward - 1
+                done_reward = self.total_reward - self.alive_reward
                 self._reset()
 
             return done_reward
@@ -109,19 +116,22 @@ if __name__ == "__main__":
     last_steps = 0
     best_mean_reward = None
 
+    loss_t = None
+    save_optim = False
+
     while True:
         step += 1
         epsilon = max(epsilon * EPS_DECAY, EPS_MIN)
 
-        if len(total_rewards) % 10 == 0:
-            env.render()
+        # if len(total_rewards) % 10 == 0:
+        env.render()
 
         reward = agent.play_step(net, epsilon, device=device)
         if reward is not None:
             total_rewards.append(reward)
-            mean_reward = np.mean(total_rewards[-100:])
-            print("episode {episodes: <3} : {epstep: <5} / {step: <10}, ended with {reward: <5}, "
-                  "mean reward {mean: <8}, (epsilon {eps: <20})"
+            mean_reward = np.sum(total_rewards[-100:])/100  # so one random early-line doesn't outweight several later
+            print("Episode {episodes: <2} : {epstep: <5} / {step: <10}, ended with {reward: <7}, "
+                  "mean reward {mean: <9}, (epsilon {eps: <18})"
                   .format(step=step,
                           episodes=len(total_rewards),
                           reward=reward,
@@ -132,9 +142,21 @@ if __name__ == "__main__":
             last_steps = step
 
             if best_mean_reward is None or best_mean_reward < mean_reward:
-                if not os.path.exists(os.path.dirname(TRAIN_PATH)):
-                    os.makedirs(os.path.dirname(TRAIN_PATH))
-                torch.save(net.state_dict(), TRAIN_PATH)
+                if save_optim:
+                    if not os.path.exists(os.path.dirname(TRAIN_OPTIM)):
+                        os.makedirs(os.path.dirname(TRAIN_OPTIM))
+                    torch.save({
+                        'step': step,
+                        'model_state_dict': net.state_dict(),
+                        'optimizer_state_dict': optimizer.state_dict(),
+                        'loss': loss_t
+                    }, TRAIN_OPTIM)
+                    print("Saved with optimizer")
+                else:
+                    if not os.path.exists(os.path.dirname(TRAIN_PATH)):
+                        os.makedirs(os.path.dirname(TRAIN_PATH))
+                    torch.save(net.state_dict(), TRAIN_PATH)
+                    print("state_dict saved")
                 best_mean_reward = mean_reward
                 if best_mean_reward is not None:
                     print("Best mean reward updated to {}".format(best_mean_reward))
@@ -144,9 +166,21 @@ if __name__ == "__main__":
                 break
 
             if len(total_rewards) % 10 == 0:
-                if not os.path.exists(os.path.dirname(TENTH_PATH)):
-                    os.makedirs(os.path.dirname(TENTH_PATH))
-                torch.save(net.state_dict(), TENTH_PATH)
+                if save_optim:
+                    if not os.path.exists(os.path.dirname(TENTH_OPTIM)):
+                        os.makedirs(os.path.dirname(TENTH_OPTIM))
+                    torch.save({
+                        'step': step,
+                        'model_state_dict': net.state_dict(),
+                        'optimizer_state_dict': optimizer.state_dict(),
+                        'loss': loss_t
+                    }, TRAIN_OPTIM)
+                    print("Tenth saved with optimizer")
+                else:
+                    if not os.path.exists(os.path.dirname(TENTH_PATH)):
+                        os.makedirs(os.path.dirname(TENTH_PATH))
+                    torch.save(net.state_dict(), TENTH_PATH)
+                    print("Tenth saved")
 
             optimizer.zero_grad()
             batch = memory.sample(BATCH_SIZE)
@@ -157,5 +191,5 @@ if __name__ == "__main__":
         if len(memory) < REPLAY_START:
             continue
 
-        if step % SYNC_FRAMES == 0:
+        if step % SYNC_NTH == 0:
             target_net.load_state_dict(net.state_dict())

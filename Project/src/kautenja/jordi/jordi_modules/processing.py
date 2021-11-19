@@ -4,8 +4,6 @@ import numpy as np
 from collections import deque
 import random
 
-HEIGHT = 30
-WIDTH = 30
 
 class MaxAndSkipEnv(gym.Wrapper):
     '''
@@ -37,18 +35,23 @@ class MaxAndSkipEnv(gym.Wrapper):
         return state
 
 
-class ProcessFrame84(gym.ObservationWrapper):
+HEIGHT = 30
+WIDTH = HEIGHT
+# WIDTH = 20
+
+
+class ProcessFrame20(gym.ObservationWrapper):
     '''
     Preprocessing to downscale a gym obersvation from it's original resolution RGB image to
     a grayscaled 20x20 image, which will be a lot easier to pass through the NN.
     Also crops out uncessessary noise, like the sidebars in our environment.
     '''
     def __init__(self, env=None):
-        super(ProcessFrame84, self).__init__(env)
+        super(ProcessFrame20, self).__init__(env)
         self.observation_space = gym.spaces.Box(low=0, high=255, shape=(WIDTH, HEIGHT, 1), dtype=np.uint8)
 
     def observation(self, obs):
-        return ProcessFrame84.process(obs)
+        return ProcessFrame20.process(obs)
 
     @staticmethod
     def process(frame):
@@ -65,7 +68,7 @@ class ProcessFrame84(gym.ObservationWrapper):
 
         # 95 + 80 / 47 + 160
         img = img[47:208, 95:174, 0] * 0.299 + img[47:208, 95:174, 1] * 0.587 + img[47:208, 95:174, 2] * 0.114
-        # cv2.cv2.imshow("before_resize", img)  # For debugging image crop
+        # cv2.imshow("before_resize", img)  # For debugging image crop
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
         resized_screen = cv2.resize(img, (WIDTH, HEIGHT), interpolation=cv2.INTER_AREA)
@@ -136,7 +139,7 @@ class ScaledFloatFrame(gym.ObservationWrapper):
 
 def wrap_env(env):
     env = MaxAndSkipEnv(env)
-    env = ProcessFrame84(env)
+    env = ProcessFrame20(env)
     env = ImageToPyTorch(env)
     env = BufferWrapper(env, 4)
     return ScaledFloatFrame(env)
