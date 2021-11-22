@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import numpy as np
 
+temp = 0
+
 
 class DQN(nn.Module):
     def __init__(self, input_shape, n_actions):
@@ -30,5 +32,9 @@ class DQN(nn.Module):
         return int(np.prod(o.size()))
 
     def forward(self, x):
+        global temp
+        temp += 1
+        if temp > 7500 and temp % 1001 == 0:
+            print(x)
         conv_out = self.conv(x).view(x.size()[0], -1)
         return self.fc(conv_out).double()
