@@ -40,11 +40,11 @@ WIDTH = 10
 
 
 class ProcessFrameXY(gym.ObservationWrapper):
-    '''
+    """
     Preprocessing to downscale a gym obersvation from it's original resolution RGB image to
     a grayscaled 20x10 image, which will be a lot easier to pass through the NN.
     Also crops out uncessessary noise, like the sidebars in our chosen environment.
-    '''
+    """
     def __init__(self, env=None):
         super(ProcessFrameXY, self).__init__(env)
         self.observation_space = gym.spaces.Box(low=0, high=255, shape=(HEIGHT, WIDTH, 1), dtype=np.uint8)
@@ -88,10 +88,10 @@ class ProcessFrameXY(gym.ObservationWrapper):
 
 
 class BufferWrapper(gym.ObservationWrapper):
-    '''
+    """
     Giving the agent a single frame of the game won't really tell it anything, so this is used
     to create a buffer with subsequent frames to give the agent an idea of where things are moving
-    '''
+    """
     def __init__(self, env, n_steps, dtype=np.float32):
         super(BufferWrapper, self).__init__(env)
         self.dtype = dtype
@@ -111,11 +111,11 @@ class BufferWrapper(gym.ObservationWrapper):
 
 
 class ImageToPyTorch(gym.ObservationWrapper):
-    '''
+    """
     Simply used to rearrange a tensors dimensions, since the nn's
     convolution layers expect the color dimension first (C, H, W),
     whereas the gym observations are in the shape (H, W, C)
-    '''
+    """
     def __init__(self, env):
         super(ImageToPyTorch, self).__init__(env)
         old_shape = self.observation_space.shape
@@ -128,13 +128,13 @@ class ImageToPyTorch(gym.ObservationWrapper):
 
 
 class ScaledFloatFrame(gym.ObservationWrapper):
-    '''
+    """
     Converts tensors with values between 0 and 255 to either
     0.0 or 1.0, since this is a better representation for the NN.
     Divisor 125 is somewhat arbitray and may differ depending on
     the environment. For the one I'm using, this ensures all tetromino
     gradients are properly rounded to 1.
-    '''
+    """
     def observation(self, obs):
         obs = np.array(obs).astype(np.float32) / 125
         return np.round(obs)

@@ -1,3 +1,5 @@
+import time
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -49,6 +51,9 @@ class Agent:
         with torch.no_grad():
             done_reward = None
 
+            print("\n\n", self.state[1])
+            time.sleep(2)
+
             if np.random.random() < epsilon:
                 action = env.action_space.sample()
             else:
@@ -61,7 +66,7 @@ class Agent:
             new_state, reward, done, info = self.env.step(action)
             self.steps_alive += 1
             self.alive_reward += self.steps_alive/25
-            self.total_reward += reward * 1000 + (self.steps_alive/25)  # TODO reward for good builds?
+            self.total_reward += reward * 1000 + (self.steps_alive/25)
 
             transition = (self.state, action,
                           reward, done, new_state)
@@ -70,7 +75,7 @@ class Agent:
             self.state = new_state
 
             if done:
-                done_reward = self.total_reward # - self.alive_reward
+                done_reward = self.total_reward  # - self.alive_reward
                 self._reset()
 
             return done_reward
@@ -101,6 +106,7 @@ if __name__ == "__main__":
     env = gym_tetris.make('TetrisA-v1')
     env = JoypadSpace(env, SIMPLE_MOVEMENT)
     env = wrap.wrap_env(env)
+    # env.seed(11)  # 0=I, 1=L, 3=Z, 4=J, 5=O, 11=T | For testing purposes
 
     net = DQN(env.observation_space.shape,
               env.action_space.n).to(device)
