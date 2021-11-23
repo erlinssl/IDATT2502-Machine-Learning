@@ -9,6 +9,8 @@ import random
 from collections import deque
 import numpy as np
 
+from jordi.jordi_modules.tetris_util import PIECE_DICT, EXT_PIECE_DICT
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -119,15 +121,8 @@ def learn():
     optimizer.step()
 
 
-piece_dict = {'T': 0, 'J': 1, 'Z': 2, 'O': 3, 'S': 4, 'L': 5, 'I': 6}
-
-ext_pieces = {'Td': 0, 'Tr': 1, 'Tu': 2, 'Tl': 3,
-              'Jd': 4, 'Jr': 5, 'Ju': 6, 'Jl': 7,
-              'Zh': 8, 'Zv': 9,
-              'O': 10,
-              'Sh': 11, 'Sv': 12,
-              'Ld': 13, 'Lr': 14, 'Lu': 15, 'Ll': 16,
-              'Ih': 17, 'Iv': 18, None: 19}
+piece_dict = PIECE_DICT
+ext_pieces = EXT_PIECE_DICT
 
 episode_rewards = []
 for i_episode in range(50):

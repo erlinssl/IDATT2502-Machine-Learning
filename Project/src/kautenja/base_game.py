@@ -28,9 +28,8 @@ piece_dict = {'T': 0, 'J': 1, 'Z': 2, 'O': 3, 'S': 4, 'L': 5, 'I': 6}
 print("main")
 done = True
 for episode in range(50):
+    state = env.reset()
     for step in range(5000):
-        if done:
-            state = env.reset()
         # action = actionspacetest(step)
         if step % 3 == 0:
             action = env.action_space.sample()
