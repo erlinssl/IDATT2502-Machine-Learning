@@ -1,3 +1,5 @@
+import time
+
 import gym_tetris
 import numpy as np
 from gym_tetris.actions import SIMPLE_MOVEMENT
@@ -22,7 +24,7 @@ def _get_tops(state):
     return tops
 
 
-def get_holes(state):
+def _get_holes_old(state):
     holes = 0
     for x in range(len(state[0])):
         first = -1
@@ -31,6 +33,16 @@ def get_holes(state):
                 continue
             if first < 0:
                 first = y
+            if state[y][x] == 0:
+                holes += 1
+    return holes
+
+
+def get_holes(state):
+    tops = _get_tops(state)
+    holes = 0
+    for x in range(len(state[0])):
+        for y in range(tops[x], len(state)):
             if state[y][x] == 0:
                 holes += 1
     return holes
@@ -61,6 +73,14 @@ def get_height_diff(state):
 
 def get_heuristics(state):
     return get_holes(state), get_clears(state), get_bumpiness(state)  # , self._aggregate_height(state)
+
+
+def _time(method, state, iter_n):
+    start = time.perf_counter()
+    for _ in range(iter_n):
+        method(state)
+    end = time.perf_counter()
+    return end - start
 
 
 def main():
