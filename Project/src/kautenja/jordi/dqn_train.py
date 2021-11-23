@@ -21,8 +21,8 @@ TRAIN_OPTIM = os.path.join(os.path.dirname(__file__), 'trained/{}_current_best_o
 TENTH_OPTIM = os.path.join(os.path.dirname(__file__), 'trained/{}_every_tenth_optim.pt'.format(VERSION))
 
 GAMMA = 0.9
-BATCH_SIZE = 2 ** 6
-REPLAY_SIZE = 2 ** 16
+BATCH_SIZE = 2 ** 5
+REPLAY_SIZE = 2 ** 13
 LEARN_RATE = 1e-4
 SYNC_NTH = 2500  # Target network will be synced with main network every n-th step
 REPLAY_START = 2 ** 16
@@ -30,7 +30,7 @@ TARGET_REWARD = 500000
 
 EPS_START = 1.0
 EPS_DECAY = 0.999985
-EPS_MIN = 0.05
+EPS_MIN = 1.0  # 0.05
 
 
 class Agent:
@@ -70,7 +70,7 @@ class Agent:
             self.state = new_state
 
             if done:
-                done_reward = self.total_reward - self.alive_reward
+                done_reward = self.total_reward # - self.alive_reward
                 self._reset()
 
             return done_reward
@@ -126,8 +126,8 @@ if __name__ == "__main__":
         print(checkpoint)
         net.load_state_dict(checkpoint['model_state_dict'])
         target_net.load_state_dict(checkpoint['model_state_dict'])
-        optimizer.load_state_dict(checkpoint['optimizer_state-dict'])  # ...state_dict
-        step = checkpoint['epoch']  # 'step'
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])  # ...state-dict
+        step = checkpoint['step']  # / epoch
         loss_t = checkpoint['loss']
         print("Checkpoint loaded")
 
@@ -186,7 +186,7 @@ if __name__ == "__main__":
                         'model_state_dict': net.state_dict(),
                         'optimizer_state_dict': optimizer.state_dict(),
                         'loss': loss_t
-                    }, TRAIN_OPTIM)
+                    }, TENTH_OPTIM)
                     print("Tenth saved with optimizer")
                 else:
                     if not os.path.exists(os.path.dirname(TENTH_PATH)):
@@ -200,12 +200,12 @@ if __name__ == "__main__":
                 plt.ylabel("Reward")
 
                 plt_info = "\n".join((r'$\gamma=%.2f$' % GAMMA,
-                                      r'$\varepsilon_start=%.1f$' % EPS_START,
-                                      r'$\varepsilon_decay=%.8f$' % EPS_DECAY,
-                                      r'$\varepsilon_min  =%.2f$' % EPS_MIN,
-                                      r'$batch_size=%d$' % BATCH_SIZE,
-                                      r'$batch_cap=%d$' % REPLAY_SIZE))
-                plt.text(0.0, 0.9 * max(total_rewards), plt_info)
+                                      r'$\varepsilon_{start}=%.1f$' % EPS_START,
+                                      r'$\varepsilon_{decay}=%.8f$' % EPS_DECAY,
+                                      r'$\varepsilon_{min}  =%.2f$' % EPS_MIN,
+                                      r'$batch_{size}=%d$' % BATCH_SIZE,
+                                      r'$batch_{cap}=%d$' % REPLAY_SIZE))
+                plt.text(0.0, 0.8 * max(total_rewards), plt_info)
 
                 plt.show()
 

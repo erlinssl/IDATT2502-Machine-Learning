@@ -34,7 +34,8 @@ class DQN(nn.Module):
     def forward(self, x):
         global temp
         temp += 1
-        if temp > 7500 and temp % 1001 == 0:
+        if temp > 7500 and temp % 2501 == 0:
             print(x)
         conv_out = self.conv(x).view(x.size()[0], -1)
-        return self.fc(conv_out).double()
+        out = self.fc(conv_out).double()
+        return out
