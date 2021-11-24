@@ -92,7 +92,7 @@ def get_heuristics(state, current_piece=None):
     the heuristics by calling _trim_state().
     """
     state = _trim_state(state, current_piece)
-    return get_holes(state), get_clears(state), get_bumpiness(state)  # , self._aggregate_height(state)
+    return get_holes(state), get_clears(state), get_bumpiness(state)
 
 
 def _trim_state(state, current_piece):
@@ -106,31 +106,24 @@ def _trim_state(state, current_piece):
     if current_piece is None:
         return state
     elif current_piece == 'Td':
-        print("Td")
         state[0][4:7] = 0
         state[1][5] = 0
     elif current_piece == 'Jd':
-        print("Jd")
         state[0][4:7] = 0
         state[1][6] = 0
     elif current_piece == 'Zh':
-        print("Zh")
         state[0][4:6] = 0
         state[1][5:7] = 0
     elif current_piece == 'O':
-        print("O")
         state[0][4:6] = 0
         state[1][4:6] = 0
     elif current_piece == 'Sh':
-        print("Sh")
         state[0][5:7] = 0
         state[1][4:6] = 0
     elif current_piece == 'Ld':
-        print('Ld')
         state[0][4:7] = 0
         state[1][4] = 0
     elif current_piece == 'Ih':
-        print('Ih')
         state[0][3:7] = 0
     else:
         print("UNEXPECTED PIECE")
@@ -138,7 +131,90 @@ def _trim_state(state, current_piece):
     return state
 
 
+def get_rotations(current_piece):
+    """
+    Returns the number of given tetromino's unique rotations and
+    its base shape.
+    """
+    if current_piece is None:
+        return None
+    elif current_piece == 'Td':
+        return (4, [[1, 1, 1],
+                    [0, 1, 0]])
+    elif current_piece == 'Jd':
+        return (4, [[1, 1, 1],
+                    [0, 0, 1]])
+    elif current_piece == 'Zh':
+        return (2, [[1, 1, 0],
+                    [0, 1, 1]])
+    elif current_piece == 'O':
+        return (1, [[1, 1],
+                    [1, 1]])
+    elif current_piece == 'Sh':
+        return (2, [[0, 1, 1],
+                    [1, 1, 0]])
+    elif current_piece == 'Ld':
+        return (4, [[1, 1, 1],
+                    [1, 0, 0]])
+    elif current_piece == 'Ih':
+        return 2, [[1, 1, 1, 1]]
+    else:
+        print("UNEXPECTED PIECE")
+        time.sleep(60)
+    return None
+
+
+def y_collision_state(state, current_piece, shape, x_offset):
+    """
+    Used to 'simulate' a tetris environment so we can find out how
+    long it takes for the given piece (shape) to collide with
+    the blocks placed on the board (state).
+    Also draws the new state that the said collision would
+    result in.
+    """
+    coords = []
+
+    state = _trim_state(state, current_piece)
+
+    new_state = np.copy(state)
+
+    for y in range(len(shape)):
+        for x in range(len(shape[0])):
+            if shape[y][x] != 0:
+                coords.append((y, x))
+
+    collisions = []
+    x_coords = []
+    for y, x in coords:
+        steps = 0
+        flag = True
+        while y < len(new_state)-1:
+            if new_state[y + 1][x + x_offset] != 0:
+                collisions.append(steps)
+                x_coords.append(x+x_offset)
+                flag = False
+                break
+            steps += 1
+            y += 1
+        if flag:
+            collisions.append(steps)
+            x_coords.append(x+x_offset)
+
+    y = min(collisions)
+
+    for row in range(len(shape)):
+        for column in range(len(shape[0])):
+            if shape[row, column] != 0:
+                new_state[y + row][column + x_offset] = 1
+
+    # print(new_state)
+    return y, new_state  # TODO May need to return y-1 depending on env
+
+
 def _time(method, state, iter_n):
+    """
+    Debugging method used to check a methods performance
+    """
     start = time.perf_counter()
     for _ in range(iter_n):
         method(state)
@@ -184,3 +260,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
