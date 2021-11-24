@@ -127,7 +127,7 @@ def _trim_state(state, current_piece):
         state[0][3:7] = 0
     else:
         print("UNEXPECTED PIECE WHILE TRIMMING", current_piece)
-        time.sleep(10)
+        # time.sleep(10)
     return state
 
 
@@ -159,9 +159,9 @@ def get_rotations(current_piece):
     elif current_piece == 'Ih':
         return 2, [[1, 1, 1, 1]]
     else:
-        print("UNEXPECTED PIECE GETTING ROTS:", current_piece)
-        time.sleep(10)
-    return None
+        # print("UNEXPECTED PIECE GETTING ROTS:", current_piece)
+        # time.sleep(10)
+        return None, []
 
 
 def y_collision_state(state, current_piece, shape, x_offset):

@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../Exercises/Exercise 8 - Reinforcement Learning/.idea/Exercise 8 - Reinforcement Learning.iml" filepath="$PROJECT_DIR$/../Exercises/Exercise 8 - Reinforcement Learning/.idea/Exercise 8 - Reinforcement Learning.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/Project.iml" filepath="$PROJECT_DIR$/.idea/Project.iml" />
     </modules>
   </component>
