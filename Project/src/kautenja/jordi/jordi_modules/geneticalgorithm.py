@@ -36,10 +36,10 @@ class GenePool:
 
 
 class GeneticAgent:
-    def __init__(self, top_weight, hole_weight, clear_weight):
+    def __init__(self, hole_weight, clear_weight, bump_weight):
         self.hole_weight = hole_weight
         self.clear_weight = clear_weight
-        self.bump_weight = top_weight
+        self.bump_weight = bump_weight
 
     def best_move(self, state, current_piece):
         global test_state
@@ -48,25 +48,29 @@ class GeneticAgent:
 
         for rot in range(rots):
             current_shape = np.rot90(shape, - rot)
-            for x in range(len(state[0][0]) - len(current_shape[0])):
+            for x in range(len(state[0][0]) - len(current_shape[0]) + 1):
                 y, new_state = utils.y_collision_state(state[0], current_piece, current_shape, x)
                 # y, new_state = utils.y_collision_state(use_state, current_shape, x)
                 # print(current_shape)
                 # print("x_off =", x, "collision after", y, "\n")  # Debugging
 
                 score = self._calc_score(new_state, current_piece)
+                # time.sleep(2)
                 if best_score is None or score > best_score:
                     best_rotation = rot
                     best_x_offset = x
-                    y_steps_best = y
+                    y_steps_best = max(y - 5, 0)
                     best_score = score
 
         # TODO optimize actions
         actions = [[1] * best_rotation,
                    [4] * 11,  # Very primitive solution, should be optimized
-                   [4] * best_x_offset,
+                   [3] * best_x_offset,
                    [5] * y_steps_best]
         return actions
+
+    def get_weights(self):
+        return self.hole_weight, self.clear_weight, self.bump_weight
 
     def _calc_score(self, new_state, current_piece):
         holes, clears, bumpiness = utils.get_heuristics(new_state, current_piece)

@@ -21,7 +21,7 @@ def main():
 
     env = gym_tetris.make('TetrisA-v1')
     env = JoypadSpace(env, SIMPLE_MOVEMENT)
-    env = wrap_env(env, buffersize=1)
+    env = wrap_env(env, buffersize=1, skip=0)
 
     agent = GeneticAgent(random.random(), random.random(), random.random())
 
@@ -37,14 +37,23 @@ def main():
         if info['current_piece'] is None:
             env.step(0)
 
-        actions = agent.best_move(state, info['current_piece'])
-        print(info['current_piece'])
+        if state[0][0][5] != 0:  # TODO Find a better way to find out if piece has been placed
+            actions = []
+            actions = agent.best_move(state, info['current_piece'])
 
-        for sub_arr in actions:
-            for action in sub_arr:
-                state, reward, done, info = env.step(action)
+            for sub_arr in actions:
+                for action in sub_arr:
+                    env.render()
+                    if done:
+                        break
+                    state, reward, done, info = env.step(action)
+                    if done:
+                        break
+                    state, reward, done, info = env.step(5)  # Buffers an extra action to hinder lossy inputs
+        else:
+            state, reward, done, info = env.step(5)
 
-    time.sleep(5)
+    print(agent.get_weights())
 
 
 if __name__ == "__main__":
