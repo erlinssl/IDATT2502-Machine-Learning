@@ -33,7 +33,6 @@ class GenePool:
         state, _, _, info = env.step(0)
         best = candidate.best_move(state, info['current_piece'])
         print(best)
-        time.sleep(2)
 
 
 class GeneticAgent:
@@ -45,11 +44,11 @@ class GeneticAgent:
     def best_move(self, state, current_piece):
         global test_state
         rots, shape = utils.get_rotations(current_piece)
-        best_rotation, best_x_offset, best_y_steps, best_score = None, None, None, None
+        best_rotation, best_x_offset, y_steps_best, best_score = None, None, None, None
 
         for rot in range(rots):
-            current_shape = np.rot90(shape, -rot)
-            for x in range(11 - len(current_shape[0])):
+            current_shape = np.rot90(shape, - rot)
+            for x in range(len(state[0][0]) - len(current_shape[0])):
                 y, new_state = utils.y_collision_state(state[0], current_piece, current_shape, x)
                 # y, new_state = utils.y_collision_state(use_state, current_shape, x)
                 # print(current_shape)
@@ -59,11 +58,14 @@ class GeneticAgent:
                 if best_score is None or score > best_score:
                     best_rotation = rot
                     best_x_offset = x
-                    best_y_steps = y
+                    y_steps_best = y
                     best_score = score
 
         # TODO optimize actions
-        actions = []
+        actions = [[1] * best_rotation,
+                   [4] * 11,  # Very primitive solution, should be optimized
+                   [4] * best_x_offset,
+                   [5] * y_steps_best]
         return actions
 
     def _calc_score(self, new_state, current_piece):
@@ -71,27 +73,27 @@ class GeneticAgent:
         return self.clear_weight * clears - self.hole_weight * holes - self.bump_weight * bumpiness
 
 
-test_state = state = np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                               [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-                               [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-                               [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-                               [0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-                               [0, 0, 0, 0, 0, 1, 0, 0, 1, 1],
-                               [1, 1, 1, 0, 1, 1, 0, 1, 1, 0],
-                               [0, 1, 1, 1, 1, 1, 0, 1, 1, 0],
-                               [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-                               ])
+test_state = np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+                       [0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+                       [0, 0, 0, 0, 0, 1, 0, 0, 1, 1],
+                       [1, 1, 1, 0, 1, 1, 0, 1, 1, 0],
+                       [0, 1, 1, 1, 1, 1, 0, 1, 1, 0],
+                       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+                       ])
 
 if __name__ == "__main__":
     print("")
