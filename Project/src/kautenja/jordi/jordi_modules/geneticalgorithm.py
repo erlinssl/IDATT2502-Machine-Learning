@@ -52,7 +52,7 @@ class GeneticAgent:
                 if best_score is None or score > best_score:
                     best_rotation = rot
                     best_x_offset = x
-                    y_steps_best = max(y - 5, 0)
+                    y_steps_best = max(y - 3, 0)
                     best_score = score
 
         # TODO optimize actions
@@ -74,14 +74,22 @@ class GeneticAgent:
 class GenePool:
     """
     The genetic algorithm, based on survival of the fittest.
-
+    Creates a number of players (GeneticAgents) with separate random weights.
+    Then iterates over each one, letting them play a given number of games, each with
+    a given number of max moves. After each player has finished their games, evolution
+    will take place. The best some percentage of players are kept and transferred to the
+    next generation. To fill up the population once gain, the transferred players are
+    'crossbred' so that their weights are passed on to the new players.
+    There is also a certain chance that a mutation will take place, meaning that a new player
+    gets a random weight, instead of one inherited from the preivous generation.
     """
-    def __init__(self, cores=4, population=16, mutateChance=0.05, games=5, moves=50, replacePercent=0.3):
+    def __init__(self, cores=4, population=16, mutateChance=0.05, games=3, moves=250, replacePercent=0.7, debug=False):
         self.population = population
         self.mutateChance = mutateChance
         self.maxGames = games
         self.maxMoves = moves
         self.replacePercent = replacePercent
+        self.debug = debug
         self.sem = threading.Semaphore(cores)  # https://github.com/JLMadsen/TetrisAI
 
     def train(self, generations):
@@ -104,14 +112,16 @@ class GenePool:
         for i_gen in range(2, generations + 2):
             print("\nTraining Generation #{}".format(i_gen))
             new_players = players[
-                          int(len(players) * (1 - self.replacePercent)):]  # keep the best replacePercent players
+                          int(len(players) * self.replacePercent):]  # keep the best replacePercent players
 
-            print(f"DEBUG: Last generations best had: {new_players[0].highscore} and {new_players[-1].highscore}")
+            if self.debug:
+                print(f"DEBUG: Last generations best had: {new_players[0].highscore} and {new_players[-1].highscore}")
 
             while len(new_players) < self.population:
-                new_players.append(self._cross_over(*random.sample(players, 2)))
+                new_players.append(self._cross_over(*random.sample(new_players, 2)))
 
-            print(f'DEBUG: {len(new_players)}')
+            if self.debug:
+                print(f'DEBUG: {len(new_players)}')
 
             new_players = self._train_generation(new_players)
 
@@ -131,9 +141,10 @@ class GenePool:
                                                                                           max=players[-1].highscore,
                                                                                           weights=gen_avg_weights))
 
-        print("Finalist players:")
-        for player in players:
-            print(player.highscore, ":", player.get_weights())
+        if self.debug:
+            print("DEBUG: Finalist players:")
+            for player in players:
+                print(player.highscore, ":", player.get_weights())
 
         plt.plot(average_scores)
         plt.title("Average scores per generation")
@@ -146,7 +157,7 @@ class GenePool:
         try:
             env = gym_tetris.make('TetrisA-v1')
             env = JoypadSpace(env, SIMPLE_MOVEMENT)
-            env = wrap_env(env)
+            env = wrap_env(env, buffersize=1)
 
             totalscore = 0
             for _ in range(self.maxGames):
@@ -157,14 +168,14 @@ class GenePool:
                 moves = 0
                 while not done and moves < self.maxMoves:
                     # Very primitive way of checking if a piece was placed, replace if possible
+                    # Tends to fail in high builds and in higher levels of the game
                     if state[0][0][5] != 0:
                         actions = player.best_move(state, info['current_piece'])
                         moves += 1
 
                         for sub_arr in actions:
                             for action in sub_arr:
-                                # env.render()
-                                # primitive way of preventing the env from crashing
+                                # primitive way of preventing the env from crashing due to stepping while done
                                 if done:
                                     break
                                 state, reward, done, info = env.step(action)
@@ -176,7 +187,7 @@ class GenePool:
                                 state, reward, done, info = env.step(0)
                                 score += reward
                     else:
-                        state, reward, done, info = env.step(0)
+                        state, reward, done, info = env.step(5)
                         score += reward
                 totalscore += score
             player.highscore = totalscore
