@@ -17,10 +17,10 @@ from jordi_modules.geneticalgorithm import GenePool, GeneticAgent
 
 def main():
     gene_pool = GenePool()
-    agent = gene_pool.train(generations=10)
+    agent = gene_pool.train(generations=20)
 
     # agent = GeneticAgent()  # random weights
-    # agent = GeneticAgent(0.6837451965245205, 0.9799808062328352, 0.1363458051326737)  # weights from train
+    # agent = GeneticAgent(0.9521941443319699, 0.8479778551751184, 0.3053698551679609)  # weights from train
 
     env = gym_tetris.make('TetrisA-v1')
     env = JoypadSpace(env, SIMPLE_MOVEMENT)

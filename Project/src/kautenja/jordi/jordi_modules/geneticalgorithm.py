@@ -83,7 +83,7 @@ class GenePool:
     There is also a certain chance that a mutation will take place, meaning that a new player
     gets a random weight, instead of one inherited from the preivous generation.
     """
-    def __init__(self, cores=4, population=16, mutateChance=0.05, games=3, moves=250, replacePercent=0.7, debug=False):
+    def __init__(self, cores=4, population=12, mutateChance=0.05, games=10, moves=50, replacePercent=0.7, debug=False):
         self.population = population
         self.mutateChance = mutateChance
         self.maxGames = games
@@ -98,7 +98,7 @@ class GenePool:
         for _ in range(self.population):
             players.append(self._random_agent())
 
-        print("Training Generation #1")
+        print("Training Generation #0")
         players = self._train_generation(players)
 
         average_scores = [sum([player.highscore for player in players]) / len(players)]
@@ -109,7 +109,7 @@ class GenePool:
         print(f"Initial avg line: {average_scores[0]} | min({players[0].highscore}) | max ({players[-1].highscore})"
               f"\nWeights:{average_weights[0]}.")
 
-        for i_gen in range(2, generations + 2):
+        for i_gen in range(1, generations + 1):
             print("\nTraining Generation #{}".format(i_gen))
             new_players = players[
                           int(len(players) * self.replacePercent):]  # keep the best replacePercent players
@@ -140,15 +140,16 @@ class GenePool:
                                                                                           min=players[0].highscore,
                                                                                           max=players[-1].highscore,
                                                                                           weights=gen_avg_weights))
+            plt.plot(average_scores)
+            plt.xlabel("Generation")
+            plt.ylabel("Lines cleared")
+            plt.title("Average score per generation")
+            plt.show()
 
         if self.debug:
             print("DEBUG: Finalist players:")
             for player in players:
                 print(player.highscore, ":", player.get_weights())
-
-        plt.plot(average_scores)
-        plt.title("Average scores per generation")
-        plt.show()
 
         return players[-1]
 
