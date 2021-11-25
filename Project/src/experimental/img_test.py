@@ -3,7 +3,7 @@ import numpy as np
 
 
 WIDTH, HEIGHT = 10, 20
-img_path = r"C:\Users\Test\Documents\ShareX\Screenshots\2021-11\python_kYkd3MhngS.png"
+img_path = r"somepath"
 img = cv2.imread(img_path)
 
 img = img[47:208, 95:176, 0] * 0.299 + img[47:208, 95:176, 1] * 0.587 + img[47:208, 95:176, 2] * 0.114

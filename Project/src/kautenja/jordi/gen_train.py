@@ -17,7 +17,7 @@ from jordi_modules.geneticalgorithm import GenePool, GeneticAgent
 
 def main():
     gene_pool = GenePool()
-    agent = gene_pool.train(generations=5)
+    agent = gene_pool.train(generations=10)
 
     # agent = GeneticAgent()  # random weights
     # agent = GeneticAgent(0.6837451965245205, 0.9799808062328352, 0.1363458051326737)  # weights from train
