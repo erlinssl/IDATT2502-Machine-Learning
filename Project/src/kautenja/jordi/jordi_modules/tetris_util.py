@@ -208,7 +208,7 @@ def y_collision_state(state, current_piece, shape, x_offset):
                 new_state[y + row][column + x_offset] = 1
 
     # print(new_state)
-    return y, new_state  # TODO May need to return y-1 depending on env
+    return y, new_state
 
 
 def _time(method, state, iter_n):

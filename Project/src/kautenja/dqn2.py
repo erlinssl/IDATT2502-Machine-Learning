@@ -76,7 +76,7 @@ steps_done = 0
 episode_durations = []
 
 
-def exploration_rate(n: int, min_rate=0.01) -> float:
+def exploration_rate(n: int, min_rate=1.00) -> float:
     global t
     return max(min_rate, 1 / (EPS_DECAY ** n + t / 250))
 
@@ -182,14 +182,14 @@ for i_episode in range(50):
             # plot.title("Reward during episode {epnum}"
             #            .format(epnum=i_episode))
             # plot.show()
+
+            plot.plot(episode_rewards)
+            plot.title("Total reward per episode")
+            plot.show()
+
+            plot.plot(episode_steps)
+            plot.title("Steps per episode")
+            plot.show()
+
             break
-
-plot.plot(episode_rewards)
-plot.title("Total reward per episode")
-plot.show()
-
-plot.plot(episode_steps)
-plot.title("Steps per episode")
-plot.show()
-
 model.save()

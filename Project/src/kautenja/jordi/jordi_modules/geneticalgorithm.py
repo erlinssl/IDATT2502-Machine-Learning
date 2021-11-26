@@ -27,6 +27,11 @@ class GeneticAgent:
 
         self.tot_score = 0
 
+    def random(self):
+        self.hole_weight = random.uniform(-1, 1)
+        self.clear_weight = random.uniform(-1, 1)
+        self.bump_weight = random.uniform(-1, 1)
+
     def best_move(self, state, current_piece):
         """
         Uses heuristics to figure out which move is the best one for the given
