@@ -18,13 +18,14 @@ class GeneticAgent:
     One agent/player with it's own set of
     weights that affect how it plays.
     """
+
     def __init__(self, hole_weight=random.uniform(-1, 1),
                  clear_weight=random.uniform(-1, 1), bump_weight=random.uniform(-1, 1)):
         self.hole_weight = hole_weight
         self.clear_weight = clear_weight
         self.bump_weight = bump_weight
 
-        self.highscore = 0
+        self.tot_score = 0
 
     def best_move(self, state, current_piece):
         """
@@ -83,7 +84,8 @@ class GenePool:
     There is also a certain chance that a mutation will take place, meaning that a new player
     gets a random weight, instead of one inherited from the preivous generation.
     """
-    def __init__(self, cores=4, population=12, mutateChance=0.05, games=10, moves=50, replacePercent=0.7, debug=False):
+
+    def __init__(self, cores=4, population=12, mutateChance=0.05, games=5, moves=150, replacePercent=0.7, debug=False):
         self.population = population
         self.mutateChance = mutateChance
         self.maxGames = games
@@ -101,31 +103,31 @@ class GenePool:
         print("Training Generation #0")
         players = self._train_generation(players)
 
-        average_scores = [sum([player.highscore for player in players]) / len(players)]
+        average_scores = [sum([player.tot_score for player in players]) / len(players)]
         average_weights = [(sum([player.hole_weight for player in players]) / len(players),
                             sum([player.clear_weight for player in players]) / len(players),
                             sum([player.bump_weight for player in players]) / len(players))]
 
-        print(f"Initial avg line: {average_scores[0]} | min({players[0].highscore}) | max ({players[-1].highscore})"
+        print(f"Initial avg line: {average_scores[0]} | min({players[0].tot_score}) | max ({players[-1].tot_score})"
               f"\nWeights:{average_weights[0]}.")
 
         for i_gen in range(1, generations + 1):
             print("\nTraining Generation #{}".format(i_gen))
-            new_players = players[
-                          int(len(players) * self.replacePercent):]  # keep the best replacePercent players
+            new_players = players = players[
+                                    int(len(players) * self.replacePercent):]  # keep the best replacePercent players
 
             if self.debug:
-                print(f"DEBUG: Last generations best had: {new_players[0].highscore} and {new_players[-1].highscore}")
+                print(f"DEBUG: Last generations best had: {new_players[0].tot_score} and {new_players[-1].tot_score}")
 
             while len(new_players) < self.population:
-                new_players.append(self._cross_over(*random.sample(new_players, 2)))
+                new_players.append(self._cross_over(*random.sample(players, 2)))
 
             if self.debug:
                 print(f'DEBUG: {len(new_players)}')
 
             new_players = self._train_generation(new_players)
 
-            gen_avg_score = sum([player.highscore for player in new_players]) / len(new_players)
+            gen_avg_score = sum([player.tot_score for player in new_players]) / len(new_players)
             gen_avg_weights = (sum([player.hole_weight for player in new_players]) / len(new_players),
                                sum([player.clear_weight for player in new_players]) / len(new_players),
                                sum([player.bump_weight for player in new_players]) / len(new_players))
@@ -137,8 +139,8 @@ class GenePool:
             print("Generation {gen: <2} ended with an average of {avg_score: <5} lines cleared."
                   "MIN|MAX: {min: <5} | {max: <5}\nWeight averages are: {weights}".format(gen=i_gen,
                                                                                           avg_score=gen_avg_score,
-                                                                                          min=players[0].highscore,
-                                                                                          max=players[-1].highscore,
+                                                                                          min=players[0].tot_score,
+                                                                                          max=players[-1].tot_score,
                                                                                           weights=gen_avg_weights))
             plt.plot(average_scores)
             plt.xlabel("Generation")
@@ -149,11 +151,11 @@ class GenePool:
         if self.debug:
             print("DEBUG: Finalist players:")
             for player in players:
-                print(player.highscore, ":", player.get_weights())
+                print(player.tot_score, ":", player.get_weights())
 
         return players[-1]
 
-    def _train_thread(self, player: GeneticAgent):
+    def _train_individual(self, player: GeneticAgent):
         self.sem.acquire()
         try:
             env = gym_tetris.make('TetrisA-v1')
@@ -191,7 +193,7 @@ class GenePool:
                         state, reward, done, info = env.step(5)
                         score += reward
                 totalscore += score
-            player.highscore = totalscore
+            player.tot_score = totalscore
             env.close()
         finally:
             self.sem.release()
@@ -199,7 +201,7 @@ class GenePool:
     def _train_generation(self, players):
         threads = []
         for player in players:
-            thread = threading.Thread(target=self._train_thread, args=(player,))
+            thread = threading.Thread(target=self._train_individual, args=(player,))
             threads.append(thread)
             thread.start()
 

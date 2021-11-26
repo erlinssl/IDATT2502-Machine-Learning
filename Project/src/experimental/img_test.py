@@ -3,7 +3,7 @@ import numpy as np
 
 
 WIDTH, HEIGHT = 10, 20
-img_path = r"somepath"
+img_path = r"C:\Users\Test\Documents\School\2021-H\IDATT2502\Course Work\Project\Documentation\Screencaps\gifs\qqqq.png"
 img = cv2.imread(img_path)
 
 img = img[47:208, 95:176, 0] * 0.299 + img[47:208, 95:176, 1] * 0.587 + img[47:208, 95:176, 2] * 0.114

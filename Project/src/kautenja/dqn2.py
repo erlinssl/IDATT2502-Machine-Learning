@@ -112,7 +112,7 @@ def learn():
 
     current_q_values = model(batch_current_state).gather(1, batch_action.type(torch.int64))
     max_next_q_values = model(batch_next_state).detach().max(1)[0]
-    expected_q_values = batch_reward + (0.95 * max_next_q_values)  # 0.8 = discount rate
+    expected_q_values = batch_reward + (0.95 * max_next_q_values)
 
     loss = F.smooth_l1_loss(current_q_values.squeeze(), expected_q_values.squeeze())
 
@@ -125,6 +125,7 @@ piece_dict = PIECE_DICT
 ext_pieces = EXT_PIECE_DICT
 
 episode_rewards = []
+episode_steps = []
 for i_episode in range(50):
     rewards = []
     total_reward = 0
@@ -145,22 +146,19 @@ for i_episode in range(50):
         _, reward, done, info = env.step(action.item())
         if info['current_piece'] is None:
             print(info)
-        if info['number_of_lines'] is None:
-            print(info)
-            print(info['number_of_lines'])
         next_state = torch.Tensor([[ext_pieces[info['current_piece']], info['number_of_lines'],
                                     info['score'], ext_pieces[info['next_piece']], info['board_height']]])
 
         if done:
             reward -= 10
 
-        # if reward == 0:  # Stay-alive bonus
-        #     reward += 1
+        if reward == 0:  # Stay-alive bonus
+            reward += 1
 
-        if reward > 0:
-            print('Gained a reward of {rew: <2} on step {step: <5}, episode {ep}'.format(rew=reward,
-                                                                                  step=t,
-                                                                                  ep=i_episode))
+        # if reward > 0:
+        #     print('Gained a reward of {rew: <2} on step {step: <5}, episode {ep}'.format(rew=reward,
+        #                                                                           step=t,
+        #                                                                           ep=i_episode))
 
         memory.append((current_state, torch.FloatTensor([[action]]),
                        next_state, torch.FloatTensor([reward])))
@@ -170,7 +168,7 @@ for i_episode in range(50):
         current_state = next_state
 
         total_reward += reward
-        rewards.append(total_reward)
+        # rewards.append(total_reward)
 
         if done:
             print("Episode {epnum: <3} exited after {stepnum: <5} steps with a total reward of {reward}".format(
@@ -179,13 +177,19 @@ for i_episode in range(50):
                 stepnum=t,
             ))
             episode_rewards.append(total_reward)
-            plot.plot(rewards)
-            plot.title("Reward during episode {epnum}"
-                       .format(epnum=i_episode))
-            plot.show()
+            episode_steps.append(t)
+            # plot.plot(rewards)
+            # plot.title("Reward during episode {epnum}"
+            #            .format(epnum=i_episode))
+            # plot.show()
             break
 
 plot.plot(episode_rewards)
 plot.title("Total reward per episode")
 plot.show()
+
+plot.plot(episode_steps)
+plot.title("Steps per episode")
+plot.show()
+
 model.save()

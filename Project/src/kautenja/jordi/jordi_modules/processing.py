@@ -145,11 +145,13 @@ class ScaledFloatFrame(gym.ObservationWrapper):
         return np.round(obs)
 
 
-def wrap_env(env, buffersize: int = 2, skip: int = 4):
+def wrap_env(env, buffersize: int = 2, skip: int = 4, heuristic=False):
     if skip > 0:
         env = MaxAndSkipEnv(env, skip=skip)
     env = ProcessFrameXY(env)
     env = ImageToPyTorch(env)
     if buffersize > 1:
         env = BufferWrapper(env, buffersize)
-    return ScaledFloatFrame(env)
+    if not heuristic:
+        env = ScaledFloatFrame(env)
+    return env

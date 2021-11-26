@@ -63,7 +63,7 @@ def get_holes(state):
 def get_clears(state):
     clears = 0
     for row in range(len(state)):
-        if np.all(state[row] == 1):
+        if np.all(state[row] != 0):
             clears += 1
     return clears
 

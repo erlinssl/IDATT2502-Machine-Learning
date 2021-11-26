@@ -1,20 +1,26 @@
-import numpy as np
+import matplotlib.pyplot as plt
 
+file = open(r'C:\Users\Test\Documents\School\2021-H\IDATT2502\Course Work\Project\Documentation\A4_v4_3 log.txt', 'r')
+lines = file.readlines()
 
-def t_and_p(array):
-    print(len(array))
-    array = [*zip(*array)]
-    print(len(array))
-    print(array, "\n")
+rewards = []
+for line in lines:
+    index = line.find("with ")
+    line = line[index+5:]
+    index = line.find(" ")
+    line = line[:index]
+    index = line.find(",")
+    if index != -1:
+        line = line[:index]
+    print(line)
+    try:
+        rew = float(line)
+    except:
+        continue
+    rewards.append(float(line))
 
-
-i_array = [[1, 1, 1, 1]]
-t_and_p(i_array)
-
-o_array = [[1, 1],
-           [1, 1]]
-t_and_p(o_array)
-
-s_array = [[0, 1, 1],
-           [1, 1, 0]]
-t_and_p(s_array)
+plt.plot(rewards)
+plt.title(f"Reward over {len(rewards)} episodes")
+plt.xlabel('Episode')
+plt.ylabel('Reward')
+plt.show()
